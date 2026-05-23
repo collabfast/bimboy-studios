@@ -1,0 +1,167 @@
+CORE CONCEPT
+No public social profiles
+The platform is a massive PPV content studio
+Creators collaborate on content
+Every verified creator in a video gets automatic revenue sharing
+Revenue splits are automatically calculated:
+1 creator = 100%
+2 creators = 50/50
+3 creators = 33.33/33.33/33.33
+4 creators = 25% each
+Platform fee configurable by admin
+Fully automated payouts
+TECH STACK
+Next.js 15 App Router
+TypeScript
+Tailwind CSS
+Supabase Auth + Database
+PostgreSQL
+Prisma ORM
+AWS Rekognition
+AWS S3 + CloudFront
+Stripe Connect Express
+FFmpeg processing workers
+Redis queues
+Daily.co or LiveKit for creator calls
+Vercel deployment
+AUTH + CREATOR ONBOARDING
+Creator-only platform
+18+ onboarding flow
+Government ID verification
+Selfie verification
+Stripe Connect onboarding
+Tax form collection
+Face registration process:
+capture multiple face angles
+save encrypted facial embeddings
+Creator dashboard onboarding wizard
+AWS FACE MATCHING SYSTEM
+Use AWS Rekognition to:
+Detect faces appearing in uploaded videos
+Compare detected faces against verified creator database
+Generate confidence scores
+Flag unverified performers
+Require creators to confirm all detected performers before publishing
+Prevent upload publishing until all performers are verified
+Store performer participation records
+VIDEO PROCESSING PIPELINE
+When a creator uploads a video:
+Upload to S3
+FFmpeg generates:
+teaser clips
+thumbnails
+blur previews
+adaptive streaming versions
+AWS Rekognition scans frames
+Detect all performer faces
+Match faces to verified creator IDs
+Generate performer participation suggestions
+Creator confirms participants
+Revenue split auto-calculated
+Publish teaser feed
+Lock full video behind PPV purchase
+PPV SYSTEM
+TikTok-style teaser feed
+Swipe vertical videos
+Teasers are free
+Full videos require unlock payment
+One-tap purchase flow
+Instant unlock access
+Watermarked streaming
+DRM-ready architecture
+Download protection placeholders
+REVENUE SHARING ENGINE
+Create automated payout logic:
+Every sale creates payout records
+Revenue split distributed automatically
+Example:
+Video sale = $20
+Platform fee = 20%
+Remaining $16 split equally
+2 creators = $8 each
+Support manual percentage overrides
+Support custom contracts
+Handle refunds proportionally
+Queue payouts automatically
+STRIPE CONNECT PAYOUT SYSTEM
+Each creator has connected Stripe account
+Automatic transfer scheduling
+Daily/weekly payout options
+Instant payout support
+Revenue ledger system
+Transaction audit logs
+Tax reporting exports
+Failed payout retry system
+DATABASE MODELS
+Create Prisma schemas for:
+Users
+Creators
+CreatorVerification
+FaceEmbeddings
+Videos
+VideoParticipants
+RevenueSplits
+Purchases
+Transactions
+Payouts
+WalletBalances
+TaxDocuments
+ModerationFlags
+ContentReports
+UploadJobs
+RekognitionResults
+CREATOR DASHBOARD
+Revenue analytics
+Video sales analytics
+Earnings charts
+Payout history
+Upcoming payouts
+Collaboration tracking
+Performer participation approvals
+Upload manager
+Tax document downloads
+Revenue split editor
+Content performance metrics
+ADMIN DASHBOARD
+Content moderation
+Creator verification review
+Manual performer verification tools
+Revenue monitoring
+Fraud detection dashboard
+Dispute management
+Payout management
+DMCA tools
+Audit logs
+SECURITY
+Signed streaming URLs
+Encrypted face embeddings
+Rate limiting
+Upload scanning
+Fraud detection
+Device fingerprinting
+Session management
+Watermark overlays
+Secure payout validation
+UI/UX
+Premium black/glassmorphism design
+iPhone-native feel
+Smooth swipe animations
+TikTok-style vertical feed
+Fast loading skeletons
+Responsive mobile-first design
+Sticky bottom nav
+Floating purchase modal
+Creator studio dashboard aesthetic
+IMPORTANT ENGINEERING REQUIREMENTS
+Use scalable architecture
+Separate upload processing workers
+Use event-driven payout processing
+Build reusable API services
+Create production-ready folder structure
+Use TypeScript everywhere
+Include README and environment setup
+Include AWS setup instructions
+Include Stripe webhook handlers
+Include Rekognition matching service
+Include local dev Docker setup
+Include seed/test creator accounts
