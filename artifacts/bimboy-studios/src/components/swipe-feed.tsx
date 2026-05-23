@@ -265,10 +265,15 @@ export function SwipeFeed() {
   return (
     <div className="swipe-app">
       <div className="swipe-topbar">
-        <div className="swipe-brand">
+        <button
+          type="button"
+          className="swipe-brand"
+          onClick={() => document.body.classList.toggle("sidebar-open")}
+          aria-label="Toggle navigation"
+        >
           <span className="swipe-brand-bim">BIM</span>
           <span className="swipe-brand-boy">BOY</span>
-        </div>
+        </button>
         <div className="swipe-topbar-actions">
           <button
             type="button"

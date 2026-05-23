@@ -804,7 +804,10 @@ main {
     padding: 24px 8px;
     border-top: none;
     border-right: 1px solid rgba(255,255,255,.08);
+    transform: translateX(-100%);
+    transition: transform 200ms ease;
   }
+  body.sidebar-open .mobile-bottom-nav { transform: translateX(0); }
   .mobile-bottom-nav-item {
     flex: 0 0 auto;
     padding: 12px 4px;
@@ -819,8 +822,11 @@ main {
   .immersive-shell { padding-bottom: 64px; }
 }
 @media (min-width: 900px) {
-  .immersive-shell { padding-left: 88px; }
+  .immersive-shell { padding-left: 0; transition: padding-left 200ms ease; }
+  body.sidebar-open .immersive-shell { padding-left: 88px; }
 }
+button.swipe-brand { background: none; border: 0; padding: 0; cursor: pointer; font: inherit; color: inherit; }
+button.swipe-brand:hover { opacity: .85; }
 
 /* === Library page === */
 .library-header { padding: 20px 4px 24px; }
