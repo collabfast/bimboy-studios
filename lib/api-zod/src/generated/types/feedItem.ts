@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { Creator } from './creator';
+import type { Participant } from './participant';
 
 export interface FeedItem {
   id: string;
@@ -20,6 +21,7 @@ export interface FeedItem {
   savesCount: number;
   tags: string[];
   creator: Creator;
+  participants: Participant[];
   unlocked: boolean;
   liked: boolean;
   saved: boolean;

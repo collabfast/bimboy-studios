@@ -18,6 +18,12 @@ export interface Creator {
   verified: boolean;
 }
 
+export interface Participant {
+  creator: Creator;
+  /** Revenue share in basis points (0-10000) */
+  splitBps: number;
+}
+
 export interface FeedItem {
   id: string;
   title: string;
@@ -31,6 +37,7 @@ export interface FeedItem {
   savesCount: number;
   tags: string[];
   creator: Creator;
+  participants: Participant[];
   unlocked: boolean;
   liked: boolean;
   saved: boolean;
@@ -77,6 +84,10 @@ export type GetFeedParams = {
  */
 limit?: number;
 userId?: string;
+};
+
+export type GetLibraryParams = {
+userId: string;
 };
 
 export type ListMyPurchasesParams = {

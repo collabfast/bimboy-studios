@@ -1,6 +1,12 @@
 import { Router, type IRouter } from "express";
-import { db, creatorsTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
+import {
+  db,
+  creatorsTable,
+  videosTable,
+  videoParticipantsTable,
+} from "@workspace/db";
+import { eq, desc, or, inArray } from "drizzle-orm";
+import { buildFeedItems } from "../lib/feed-items";
 
 const router: IRouter = Router();
 
@@ -38,6 +44,43 @@ router.get("/creators/:handle", async (req, res) => {
     bio: row.bio,
     verified: row.verified,
   });
+});
+
+router.get("/creators/:handle/videos", async (req, res) => {
+  // @ts-ignore
+  const handle = req.params.handle as string;
+  const [creator] = await db
+    .select()
+    .from(creatorsTable)
+    .where(eq(creatorsTable.handle, handle))
+    .limit(1);
+  if (!creator) {
+    res.status(404).json({ error: "Not found" });
+    return;
+  }
+  // Include both lead-owned videos and collab appearances so a creator's
+  // public profile shows every drop they earn a split from.
+  const participantVideoIds = (
+    await db
+      .select({ videoId: videoParticipantsTable.videoId })
+      .from(videoParticipantsTable)
+      .where(eq(videoParticipantsTable.creatorId, creator.id))
+  ).map((r) => r.videoId);
+
+  const rows = await db
+    .select({ v: videosTable, c: creatorsTable })
+    .from(videosTable)
+    .innerJoin(creatorsTable, eq(videosTable.creatorId, creatorsTable.id))
+    .where(
+      participantVideoIds.length > 0
+        ? or(
+            eq(videosTable.creatorId, creator.id),
+            inArray(videosTable.id, participantVideoIds),
+          )
+        : eq(videosTable.creatorId, creator.id),
+    )
+    .orderBy(desc(videosTable.createdAt));
+  res.json({ items: await buildFeedItems(rows, null) });
 });
 
 export default router;

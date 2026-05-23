@@ -1,8 +1,13 @@
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
   import { SiteHeader } from "./components/site-header";
   import { SiteFooter } from "./components/site-footer";
+  import { AgeGate } from "./components/age-gate";
+  import { MobileBottomNav } from "./components/mobile-bottom-nav";
   import "./index.css";
   import Page_feed from "./pages/feed";
+  import Page_library from "./pages/library";
+  import Page_creator from "./pages/creator";
+  import Page_studio from "./pages/studio";
 
   import Layout_admin from "./pages/_layout__admin";
 import Layout_dashboard from "./pages/_layout__dashboard";
@@ -56,9 +61,19 @@ import Page__slug_ from "./pages/_slug_";
 
   function Chrome({ children }: { children: React.ReactNode }) {
     const [loc] = useLocation();
-    const isFeed = loc === "/" || loc === "/feed";
-    if (isFeed) {
-      return <div className="relative">{children}</div>;
+    const isImmersive =
+      loc === "/" ||
+      loc === "/feed" ||
+      loc === "/library" ||
+      loc === "/studio" ||
+      loc.startsWith("/c/");
+    if (isImmersive) {
+      return (
+        <div className="relative immersive-shell">
+          {children}
+          <MobileBottomNav />
+        </div>
+      );
     }
     return (
       <div className="relative flex min-h-screen flex-col">
@@ -72,8 +87,12 @@ import Page__slug_ from "./pages/_slug_";
   export default function App() {
     return (
       <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+        <AgeGate />
         <Chrome>
             <Switch>
+          <Route path="/library"><Page_library /></Route>
+          <Route path="/studio"><Page_studio /></Route>
+          <Route path="/c/:handle"><Page_creator /></Route>
           <Route path="/studio-dashboard/royalties"><Layout_studio_dashboard><Page_studio_dashboard__royalties /></Layout_studio_dashboard></Route>
         <Route path="/studio-dashboard/settings"><Layout_studio_dashboard><Page_studio_dashboard__settings /></Layout_studio_dashboard></Route>
         <Route path="/studio-dashboard/videos"><Layout_studio_dashboard><Page_studio_dashboard__videos /></Layout_studio_dashboard></Route>

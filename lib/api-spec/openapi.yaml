@@ -78,6 +78,38 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Creator" }
         "404": { description: Not found }
+  /creators/{handle}/videos:
+    get:
+      operationId: getCreatorVideos
+      tags: [creators]
+      parameters:
+        - in: path
+          name: handle
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/FeedResponse" }
+        "404": { description: Not found }
+  /library:
+    get:
+      operationId: getLibrary
+      tags: [purchases]
+      summary: Videos the user has unlocked
+      parameters:
+        - in: query
+          name: userId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/FeedResponse" }
   /videos/{videoId}/like:
     post:
       operationId: toggleLike
@@ -182,6 +214,7 @@ components:
         - savesCount
         - tags
         - creator
+        - participants
         - unlocked
         - liked
         - saved
@@ -200,9 +233,18 @@ components:
           type: array
           items: { type: string }
         creator: { $ref: "#/components/schemas/Creator" }
+        participants:
+          type: array
+          items: { $ref: "#/components/schemas/Participant" }
         unlocked: { type: boolean }
         liked: { type: boolean }
         saved: { type: boolean }
+    Participant:
+      type: object
+      required: [creator, splitBps]
+      properties:
+        creator: { $ref: "#/components/schemas/Creator" }
+        splitBps: { type: integer, description: "Revenue share in basis points (0-10000)" }
     FeedResponse:
       type: object
       required: [items]

@@ -50,6 +50,17 @@ export const GetFeedResponse = zod.object({
   "bio": zod.string().nullish(),
   "verified": zod.boolean()
 }),
+  "participants": zod.array(zod.object({
+  "creator": zod.object({
+  "id": zod.string(),
+  "handle": zod.string(),
+  "displayName": zod.string(),
+  "avatarUrl": zod.string(),
+  "bio": zod.string().nullish(),
+  "verified": zod.boolean()
+}),
+  "splitBps": zod.number().describe('Revenue share in basis points (0-10000)')
+})),
   "unlocked": zod.boolean(),
   "liked": zod.boolean(),
   "saved": zod.boolean()
@@ -82,6 +93,95 @@ export const GetCreatorResponse = zod.object({
   "avatarUrl": zod.string(),
   "bio": zod.string().nullish(),
   "verified": zod.boolean()
+})
+
+
+export const GetCreatorVideosParams = zod.object({
+  "handle": zod.coerce.string()
+})
+
+export const GetCreatorVideosResponse = zod.object({
+  "items": zod.array(zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "teaserUrl": zod.string(),
+  "fullUrl": zod.string(),
+  "posterUrl": zod.string().nullish(),
+  "gradient": zod.string(),
+  "durationSeconds": zod.number(),
+  "priceCents": zod.number(),
+  "likesCount": zod.number(),
+  "savesCount": zod.number(),
+  "tags": zod.array(zod.string()),
+  "creator": zod.object({
+  "id": zod.string(),
+  "handle": zod.string(),
+  "displayName": zod.string(),
+  "avatarUrl": zod.string(),
+  "bio": zod.string().nullish(),
+  "verified": zod.boolean()
+}),
+  "participants": zod.array(zod.object({
+  "creator": zod.object({
+  "id": zod.string(),
+  "handle": zod.string(),
+  "displayName": zod.string(),
+  "avatarUrl": zod.string(),
+  "bio": zod.string().nullish(),
+  "verified": zod.boolean()
+}),
+  "splitBps": zod.number().describe('Revenue share in basis points (0-10000)')
+})),
+  "unlocked": zod.boolean(),
+  "liked": zod.boolean(),
+  "saved": zod.boolean()
+}))
+})
+
+
+/**
+ * @summary Videos the user has unlocked
+ */
+export const GetLibraryQueryParams = zod.object({
+  "userId": zod.coerce.string()
+})
+
+export const GetLibraryResponse = zod.object({
+  "items": zod.array(zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "teaserUrl": zod.string(),
+  "fullUrl": zod.string(),
+  "posterUrl": zod.string().nullish(),
+  "gradient": zod.string(),
+  "durationSeconds": zod.number(),
+  "priceCents": zod.number(),
+  "likesCount": zod.number(),
+  "savesCount": zod.number(),
+  "tags": zod.array(zod.string()),
+  "creator": zod.object({
+  "id": zod.string(),
+  "handle": zod.string(),
+  "displayName": zod.string(),
+  "avatarUrl": zod.string(),
+  "bio": zod.string().nullish(),
+  "verified": zod.boolean()
+}),
+  "participants": zod.array(zod.object({
+  "creator": zod.object({
+  "id": zod.string(),
+  "handle": zod.string(),
+  "displayName": zod.string(),
+  "avatarUrl": zod.string(),
+  "bio": zod.string().nullish(),
+  "verified": zod.boolean()
+}),
+  "splitBps": zod.number().describe('Revenue share in basis points (0-10000)')
+})),
+  "unlocked": zod.boolean(),
+  "liked": zod.boolean(),
+  "saved": zod.boolean()
+}))
 })
 
 

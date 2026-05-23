@@ -23,6 +23,7 @@ import type {
   Creator,
   FeedResponse,
   GetFeedParams,
+  GetLibraryParams,
   HealthStatus,
   InteractionRequest,
   InteractionResponse,
@@ -341,6 +342,161 @@ export function useGetCreator<TData = Awaited<ReturnType<typeof getCreator>>, TE
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetCreatorQueryOptions(handle,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetCreatorVideosUrl = (handle: string,) => {
+
+
+
+
+  return `/api/creators/${handle}/videos`
+}
+
+export const getCreatorVideos = async (handle: string, options?: RequestInit): Promise<FeedResponse> => {
+
+  return customFetch<FeedResponse>(getGetCreatorVideosUrl(handle),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCreatorVideosQueryKey = (handle: string,) => {
+    return [
+    `/api/creators/${handle}/videos`
+    ] as const;
+    }
+
+
+export const getGetCreatorVideosQueryOptions = <TData = Awaited<ReturnType<typeof getCreatorVideos>>, TError = ErrorType<void>>(handle: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCreatorVideos>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCreatorVideosQueryKey(handle);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCreatorVideos>>> = ({ signal }) => getCreatorVideos(handle, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(handle), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCreatorVideos>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetCreatorVideosQueryResult = NonNullable<Awaited<ReturnType<typeof getCreatorVideos>>>
+export type GetCreatorVideosQueryError = ErrorType<void>
+
+
+
+export function useGetCreatorVideos<TData = Awaited<ReturnType<typeof getCreatorVideos>>, TError = ErrorType<void>>(
+ handle: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCreatorVideos>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetCreatorVideosQueryOptions(handle,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetLibraryUrl = (params: GetLibraryParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/library?${stringifiedParams}` : `/api/library`
+}
+
+/**
+ * @summary Videos the user has unlocked
+ */
+export const getLibrary = async (params: GetLibraryParams, options?: RequestInit): Promise<FeedResponse> => {
+
+  return customFetch<FeedResponse>(getGetLibraryUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetLibraryQueryKey = (params?: GetLibraryParams,) => {
+    return [
+    `/api/library`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetLibraryQueryOptions = <TData = Awaited<ReturnType<typeof getLibrary>>, TError = ErrorType<unknown>>(params: GetLibraryParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getLibrary>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetLibraryQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getLibrary>>> = ({ signal }) => getLibrary(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getLibrary>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetLibraryQueryResult = NonNullable<Awaited<ReturnType<typeof getLibrary>>>
+export type GetLibraryQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Videos the user has unlocked
+ */
+
+export function useGetLibrary<TData = Awaited<ReturnType<typeof getLibrary>>, TError = ErrorType<unknown>>(
+ params: GetLibraryParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getLibrary>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetLibraryQueryOptions(params,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

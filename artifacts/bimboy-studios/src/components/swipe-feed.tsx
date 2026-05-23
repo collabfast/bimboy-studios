@@ -818,6 +818,17 @@ function TeaserCard({
             )}
           </div>
           <div className="swipe-teaser-title">{item.title}</div>
+          {item.participants && item.participants.length > 1 && (
+            <div className="swipe-teaser-feat">
+              feat.{" "}
+              {item.participants
+                .filter((p) => p.creator.handle !== item.creator.handle)
+                .slice(0, 2)
+                .map((p) => p.creator.displayName)
+                .join(" & ")}
+              {item.participants.length > 3 ? " +more" : ""}
+            </div>
+          )}
           <div className="swipe-teaser-stats">
             <button
               type="button"
