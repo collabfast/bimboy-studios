@@ -1,0 +1,113 @@
+Build a mobile-first NSFW creator platform inspired by short-form swipe apps like TikTok/FikFap, focused on teaser clips that lead into paid PPV content unlocks. The platform should feel smooth, addictive, fast, and optimized for creators selling premium videos.
+Core Concept:
+Users browse a vertical feed of short teaser videos.
+Swipe UP = unlock/buy full PPV video.
+Swipe DOWN = save teaser to favorites/watchlist.
+Swipe LEFT or RIGHT = go to next/previous teaser.
+Infinite scrolling feed with smart recommendations.
+Focus heavily on creator monetization and fast user interaction.
+Tech Stack:
+Frontend: Next.js + TailwindCSS + Framer Motion
+Backend: Supabase or Firebase
+Video Hosting: Cloudflare Stream or Mux
+Payments: Stripe for subscriptions + PPV purchases
+Authentication: Email + OAuth login
+Mobile-first responsive design
+Dark UI aesthetic similar to modern creator apps
+Main Features:
+Vertical Swipe Feed
+Full-screen autoplay teaser videos
+Gesture-based navigation
+Smooth transitions and animations
+Lazy loading for videos
+Mute/unmute toggle
+Like/share/save buttons overlayed on video
+PPV Unlock System
+Creators upload teaser + locked full video
+Users can purchase full content instantly
+Blur preview before unlock
+One-tap payment flow
+Purchased videos saved to library
+Creator Profiles
+Profile picture, bio, tags, verification badge
+Follower counts
+Premium subscription option
+Teaser grid
+Locked content tab
+Creator analytics dashboard
+Discovery Algorithm
+Recommended feed based on watch time, likes, purchases, saves
+Trending creators section
+NSFW category filtering
+Tags/interests system
+Moderation & Compliance
+18+ age gate
+Content reporting system
+AI moderation for banned content
+DMCA reporting tools
+Consent verification system for uploads
+Terms system requiring model release acknowledgment
+Safe Mode toggle for less explicit browsing
+Monetization
+PPV unlocks
+Monthly creator subscriptions
+Tips
+Premium boosts for creators
+Referral program
+User Features
+Saved teasers/watchlist
+Purchase history
+Following feed
+Push notifications
+Recently viewed
+Dark mode UI
+Admin Dashboard
+Manage creators/users
+Remove flagged content
+Review reports
+Revenue analytics
+Ban/suspension system
+UI/UX Style:
+Cinematic dark interface
+Smooth swipe gestures
+Neon accent colors
+Minimal overlays
+Highly polished animations
+Fast-loading experience similar to TikTok/Reels
+Database Models:
+Users
+Creators
+Videos
+Purchases
+Likes
+Saves
+Comments
+Reports
+Subscriptions
+Transactions
+Important Technical Notes:
+Optimize streaming for mobile
+Use signed URLs for protected premium videos
+Prevent direct video downloading
+Implement CDN caching
+Use server-side purchase verification
+Build scalable recommendation architecture
+Extra Features:
+“Swipe Heatmap” analytics for creators
+AI-generated teaser thumbnails
+Geo-based trending feed
+Live creator streaming option
+Voice/video tipping reactions
+Creator collab tagging
+Generate:
+Full frontend UI
+Database schema
+API routes
+Authentication flow
+Swipe gesture system
+Video player logic
+Stripe integration
+Responsive mobile layouts
+Clean scalable codebase structure
+Deployment instructions
+The final result should feel like a polished modern adult-content social platform optimized for short-form teaser browsing and impulse PPV purchases.
