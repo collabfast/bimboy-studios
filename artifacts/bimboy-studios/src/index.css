@@ -690,8 +690,30 @@ main {
   background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14);
   color: #fff; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  z-index: 2;
+  z-index: 3;
 }
+.swipe-viewer-expand {
+  position: absolute; top: 22px; right: 74px;
+  width: 40px; height: 40px; border-radius: 999px;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14);
+  color: #fff; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 3;
+  transition: background 0.15s ease;
+}
+.swipe-viewer-expand:hover { background: rgba(255,255,255,0.16); }
+.swipe-viewer-backdrop.is-expanded { padding: 0; }
+.swipe-viewer-frame.is-expanded {
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  max-height: none;
+  aspect-ratio: auto;
+  border-radius: 0;
+  box-shadow: none;
+}
+.swipe-viewer-backdrop.is-expanded .swipe-viewer-nav-prev { left: 24px; }
+.swipe-viewer-backdrop.is-expanded .swipe-viewer-nav-next { right: 24px; }
 .swipe-viewer-nav {
   position: absolute; top: 50%; transform: translateY(-50%);
   width: 48px; height: 48px; border-radius: 999px;

@@ -24,6 +24,8 @@ import {
   Loader2,
   Play,
   X,
+  Maximize2,
+  Minimize2,
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -877,14 +879,24 @@ function ViewerOverlay(
   props: SwipeCardProps & { onClose: () => void },
 ) {
   const { onClose, ...cardProps } = props;
+  const [expanded, setExpanded] = useState(false);
   return (
     <motion.div
-      className="swipe-viewer-backdrop"
+      className={`swipe-viewer-backdrop ${expanded ? "is-expanded" : ""}`}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onClick={onClose}
     >
+      <button
+        type="button"
+        className="swipe-viewer-expand"
+        onClick={(e) => { e.stopPropagation(); setExpanded((v) => !v); }}
+        aria-label={expanded ? "Shrink" : "Fit to screen"}
+        title={expanded ? "Shrink" : "Fit to screen"}
+      >
+        {expanded ? <Minimize2 className="h-5 w-5" /> : <Maximize2 className="h-5 w-5" />}
+      </button>
       <button type="button" className="swipe-viewer-close" onClick={onClose} aria-label="Close">
         <X className="h-5 w-5" />
       </button>
@@ -905,7 +917,7 @@ function ViewerOverlay(
         <ChevronRight className="h-6 w-6" />
       </button>
       <motion.div
-        className="swipe-viewer-frame"
+        className={`swipe-viewer-frame ${expanded ? "is-expanded" : ""}`}
         initial={{ scale: 0.96, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.96, opacity: 0 }}
