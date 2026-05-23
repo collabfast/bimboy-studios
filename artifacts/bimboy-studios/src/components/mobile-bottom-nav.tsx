@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Flame, Library, LayoutDashboard, Rocket } from "lucide-react";
+import { Flame, Library, LayoutDashboard, Rocket, PlusSquare } from "lucide-react";
 
 export function MobileBottomNav() {
   const [loc] = useLocation();
@@ -8,6 +8,7 @@ export function MobileBottomNav() {
     { href: "/library", label: "Library", icon: Library, match: loc.startsWith("/library") },
     { href: "/studio", label: "Studio", icon: LayoutDashboard, match: loc.startsWith("/studio") },
     { href: "/boost", label: "Boost", icon: Rocket, match: loc.startsWith("/boost") },
+    { href: "/post", label: "Post", icon: PlusSquare, match: loc.startsWith("/post") },
   ];
   return (
     <nav className="mobile-bottom-nav" aria-label="Primary">
