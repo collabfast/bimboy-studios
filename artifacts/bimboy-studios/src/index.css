@@ -109,6 +109,9 @@ main {
   display: flex;
   flex-direction: column;
 }
+@media (min-width: 900px) {
+  .swipe-app { left: 88px; }
+}
 .swipe-topbar {
   position: relative;
   z-index: 5;
@@ -763,11 +766,30 @@ main {
 }
 .mobile-bottom-nav-item.is-active { color: #ff7ab8; }
 @media (min-width: 900px) {
-  .mobile-bottom-nav { display: none; }
+  .mobile-bottom-nav {
+    top: 0; right: auto; bottom: 0;
+    width: 88px;
+    flex-direction: column; align-items: stretch; justify-content: flex-start;
+    gap: 4px;
+    padding: 24px 8px;
+    border-top: none;
+    border-right: 1px solid rgba(255,255,255,.08);
+  }
+  .mobile-bottom-nav-item {
+    flex: 0 0 auto;
+    padding: 12px 4px;
+    border-radius: 12px;
+    font-size: 11px;
+  }
+  .mobile-bottom-nav-item:hover { background: rgba(255,255,255,.04); color: rgba(255,255,255,.9); }
+  .mobile-bottom-nav-item.is-active { background: rgba(255,122,184,.10); }
 }
 .immersive-shell { min-height: 100vh; padding-bottom: env(safe-area-inset-bottom, 0px); }
 @media (max-width: 899px) {
   .immersive-shell { padding-bottom: 64px; }
+}
+@media (min-width: 900px) {
+  .immersive-shell { padding-left: 88px; }
 }
 
 /* === Library page === */
