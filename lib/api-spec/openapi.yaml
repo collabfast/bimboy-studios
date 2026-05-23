@@ -3,20 +3,22 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Bimboy Studios API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
-    description: Health operations
+  - name: feed
+  - name: creators
+  - name: purchases
+  - name: interactions
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +26,222 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /feed:
+    get:
+      operationId: getFeed
+      tags: [feed]
+      summary: Vertical swipe feed of teasers
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+        - in: query
+          name: userId
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FeedResponse"
+  /creators:
+    get:
+      operationId: listCreators
+      tags: [creators]
+      summary: List trending creators
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Creator" }
+  /creators/{handle}:
+    get:
+      operationId: getCreator
+      tags: [creators]
+      parameters:
+        - in: path
+          name: handle
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Creator" }
+        "404": { description: Not found }
+  /videos/{videoId}/like:
+    post:
+      operationId: toggleLike
+      tags: [interactions]
+      parameters:
+        - in: path
+          name: videoId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/InteractionRequest" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/InteractionResponse" }
+  /videos/{videoId}/save:
+    post:
+      operationId: toggleSave
+      tags: [interactions]
+      parameters:
+        - in: path
+          name: videoId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/InteractionRequest" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/InteractionResponse" }
+  /purchases:
+    post:
+      operationId: createPurchase
+      tags: [purchases]
+      summary: Placeholder CCBill PPV purchase
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PurchaseRequest" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PurchaseResponse" }
+  /purchases/me:
+    get:
+      operationId: listMyPurchases
+      tags: [purchases]
+      parameters:
+        - in: query
+          name: userId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Purchase" }
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
-        status:
-          type: string
+        status: { type: string }
+    Creator:
+      type: object
+      required: [id, handle, displayName, avatarUrl, verified]
+      properties:
+        id: { type: string }
+        handle: { type: string }
+        displayName: { type: string }
+        avatarUrl: { type: string }
+        bio: { type: string, nullable: true }
+        verified: { type: boolean }
+    FeedItem:
+      type: object
       required:
-        - status
-
+        - id
+        - title
+        - teaserUrl
+        - fullUrl
+        - gradient
+        - durationSeconds
+        - priceCents
+        - likesCount
+        - savesCount
+        - tags
+        - creator
+        - unlocked
+        - liked
+        - saved
+      properties:
+        id: { type: string }
+        title: { type: string }
+        teaserUrl: { type: string }
+        fullUrl: { type: string }
+        posterUrl: { type: string, nullable: true }
+        gradient: { type: string }
+        durationSeconds: { type: integer }
+        priceCents: { type: integer }
+        likesCount: { type: integer }
+        savesCount: { type: integer }
+        tags:
+          type: array
+          items: { type: string }
+        creator: { $ref: "#/components/schemas/Creator" }
+        unlocked: { type: boolean }
+        liked: { type: boolean }
+        saved: { type: boolean }
+    FeedResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/FeedItem" }
+    InteractionRequest:
+      type: object
+      required: [userId]
+      properties:
+        userId: { type: string }
+    InteractionResponse:
+      type: object
+      required: [active, count]
+      properties:
+        active: { type: boolean }
+        count: { type: integer }
+    PurchaseRequest:
+      type: object
+      required: [userId, videoId]
+      properties:
+        userId: { type: string }
+        videoId: { type: string }
+    Purchase:
+      type: object
+      required: [id, userId, videoId, amountCents, provider, providerRef, status, createdAt]
+      properties:
+        id: { type: string }
+        userId: { type: string }
+        videoId: { type: string }
+        amountCents: { type: integer }
+        provider: { type: string }
+        providerRef: { type: string }
+        status: { type: string }
+        createdAt: { type: string, format: date-time }
+    PurchaseResponse:
+      type: object
+      required: [purchase, redirectUrl]
+      properties:
+        purchase: { $ref: "#/components/schemas/Purchase" }
+        redirectUrl: { type: string }

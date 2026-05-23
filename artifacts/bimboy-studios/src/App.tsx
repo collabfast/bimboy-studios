@@ -1,7 +1,8 @@
-import { Switch, Route, Router as WouterRouter } from "wouter";
+import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
   import { SiteHeader } from "./components/site-header";
   import { SiteFooter } from "./components/site-footer";
   import "./index.css";
+  import Page_feed from "./pages/feed";
 
   import Layout_admin from "./pages/_layout__admin";
 import Layout_dashboard from "./pages/_layout__dashboard";
@@ -53,12 +54,25 @@ import Page__slug_ from "./pages/_slug_";
     );
   }
 
+  function Chrome({ children }: { children: React.ReactNode }) {
+    const [loc] = useLocation();
+    const isFeed = loc === "/" || loc === "/feed";
+    if (isFeed) {
+      return <div className="relative">{children}</div>;
+    }
+    return (
+      <div className="relative flex min-h-screen flex-col">
+        <SiteHeader />
+        <main className="flex-1 pb-16">{children}</main>
+        <SiteFooter />
+      </div>
+    );
+  }
+
   export default function App() {
     return (
       <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-        <div className="relative flex min-h-screen flex-col">
-          <SiteHeader />
-          <main className="flex-1 pb-16">
+        <Chrome>
             <Switch>
           <Route path="/studio-dashboard/royalties"><Layout_studio_dashboard><Page_studio_dashboard__royalties /></Layout_studio_dashboard></Route>
         <Route path="/studio-dashboard/settings"><Layout_studio_dashboard><Page_studio_dashboard__settings /></Layout_studio_dashboard></Route>
@@ -95,13 +109,13 @@ import Page__slug_ from "./pages/_slug_";
         <Route path="/login"><Page_login /></Route>
         <Route path="/terms"><Page_terms /></Route>
         <Route path="/dmca"><Page_dmca /></Route>
-        <Route path="/"><Page_index /></Route>
+        <Route path="/feed"><Page_feed /></Route>
+        <Route path="/welcome"><Page_index /></Route>
+        <Route path="/"><Page_feed /></Route>
         <Route path="/:slug"><Page__slug_ /></Route>
               <Route><NotFound /></Route>
             </Switch>
-          </main>
-          <SiteFooter />
-        </div>
+        </Chrome>
       </WouterRouter>
     );
   }

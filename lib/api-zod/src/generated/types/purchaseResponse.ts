@@ -5,7 +5,9 @@
  * Bimboy Studios API
  * OpenAPI spec version: 0.1.0
  */
+import type { Purchase } from './purchase';
 
-export interface HealthStatus {
-  status: string;
+export interface PurchaseResponse {
+  purchase: Purchase;
+  redirectUrl: string;
 }
