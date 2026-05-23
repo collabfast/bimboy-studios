@@ -1,0 +1,79 @@
+cat > public/images/hero-banner.svg
+cat > public/images/hero-banner.svg
+<svg width="1600" height="900" viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#030303"/>
+      <stop offset="55%" stop-color="#120018"/>
+      <stop offset="100%" stop-color="#05010b"/>
+    </linearGradient>
+
+    <radialGradient id="pinkGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff4fd8" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#ff4fd8" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="purpleGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="blueGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
+    </radialGradient>
+
+    <linearGradient id="bodyA" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#23232b"/>
+      <stop offset="100%" stop-color="#101014"/>
+    </linearGradient>
+
+    <linearGradient id="bodyB" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1d1d24"/>
+      <stop offset="100%" stop-color="#0a0a0f"/>
+    </linearGradient>
+
+    <filter id="softBlur">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)"/>
+
+  <ellipse cx="1180" cy="180" rx="260" ry="180" fill="url(#pinkGlow)" filter="url(#softBlur)"/>
+  <ellipse cx="360" cy="710" rx="300" ry="210" fill="url(#purpleGlow)" filter="url(#softBlur)"/>
+  <ellipse cx="820" cy="260" rx="220" ry="140" fill="url(#blueGlow)" filter="url(#softBlur)"/>
+
+  <rect x="90" y="120" width="1420" height="660" rx="42" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.08)"/>
+
+  <ellipse cx="620" cy="705" rx="170" ry="42" fill="#00000066"/>
+  <ellipse cx="915" cy="705" rx="185" ry="46" fill="#00000077"/>
+
+  <circle cx="618" cy="250" r="62" fill="#252530"/>
+  <rect x="525" y="308" width="186" height="298" rx="92" fill="url(#bodyA)"/>
+  <rect x="548" y="372" width="54" height="180" rx="27" fill="#1a1a22"/>
+  <rect x="635" y="372" width="54" height="180" rx="27" fill="#1a1a22"/>
+  <rect x="498" y="336" width="52" height="170" rx="26" fill="#17171d" transform="rotate(12 498 336)"/>
+  <rect x="688" y="328" width="52" height="178" rx="26" fill="#17171d" transform="rotate(-12 688 328)"/>
+
+  <circle cx="930" cy="220" r="70" fill="#22222b"/>
+  <rect x="820" y="290" width="220" height="340" rx="110" fill="url(#bodyB)"/>
+  <rect x="846" y="372" width="62" height="215" rx="31" fill="#16161c"/>
+  <rect x="956" y="372" width="62" height="215" rx="31" fill="#16161c"/>
+  <rect x="782" y="330" width="56" height="190" rx="28" fill="#14141a" transform="rotate(8 782 330)"/>
+  <rect x="1032" y="330" width="56" height="190" rx="28" fill="#14141a" transform="rotate(-10 1032 330)"/>
+
+  <polygon points="607,462 626,422 667,422 634,397 647,357 607,381 568,357 581,397 548,422 589,422"
+           fill="#ff4fd8"/>
+  <rect x="852" y="430" width="156" height="34" rx="17" fill="#8b5cf6"/>
+
+  <rect x="560" y="610" width="118" height="8" rx="4" fill="#ffffff22"/>
+  <rect x="865" y="642" width="130" height="8" rx="4" fill="#ffffff1a"/>
+
+  <text x="140" y="708" fill="#ffffff" font-size="76" font-family="Arial" font-weight="700">
+    BIMBOY STUDIOS
+  </text>
+  <text x="142" y="770" fill="#ffffffaa" font-size="26" font-family="Arial">
+    luxury creator platform • studio releases • royalty-driven talent
+  </text>
+</svg>
