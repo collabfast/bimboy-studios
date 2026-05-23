@@ -23,11 +23,8 @@ import type {
   Creator,
   FeedResponse,
   GetFeedParams,
-  GetLibraryParams,
   HealthStatus,
-  InteractionRequest,
   InteractionResponse,
-  ListMyPurchasesParams,
   Purchase,
   PurchaseRequest,
   PurchaseResponse
@@ -425,27 +422,20 @@ export function useGetCreatorVideos<TData = Awaited<ReturnType<typeof getCreator
 
 
 
-export const getGetLibraryUrl = (params: GetLibraryParams,) => {
-  const normalizedParams = new URLSearchParams();
+export const getGetLibraryUrl = () => {
 
-  Object.entries(params || {}).forEach(([key, value]) => {
 
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
-    }
-  });
 
-  const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/library?${stringifiedParams}` : `/api/library`
+  return `/api/library`
 }
 
 /**
  * @summary Videos the user has unlocked
  */
-export const getLibrary = async (params: GetLibraryParams, options?: RequestInit): Promise<FeedResponse> => {
+export const getLibrary = async ( options?: RequestInit): Promise<FeedResponse> => {
 
-  return customFetch<FeedResponse>(getGetLibraryUrl(params),
+  return customFetch<FeedResponse>(getGetLibraryUrl(),
   {
     ...options,
     method: 'GET'
@@ -458,23 +448,23 @@ export const getLibrary = async (params: GetLibraryParams, options?: RequestInit
 
 
 
-export const getGetLibraryQueryKey = (params?: GetLibraryParams,) => {
+export const getGetLibraryQueryKey = () => {
     return [
-    `/api/library`, ...(params ? [params] : [])
+    `/api/library`
     ] as const;
     }
 
 
-export const getGetLibraryQueryOptions = <TData = Awaited<ReturnType<typeof getLibrary>>, TError = ErrorType<unknown>>(params: GetLibraryParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getLibrary>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+export const getGetLibraryQueryOptions = <TData = Awaited<ReturnType<typeof getLibrary>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getLibrary>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetLibraryQueryKey(params);
+  const queryKey =  queryOptions?.queryKey ?? getGetLibraryQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getLibrary>>> = ({ signal }) => getLibrary(params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getLibrary>>> = ({ signal }) => getLibrary({ signal, ...requestOptions });
 
 
 
@@ -492,11 +482,11 @@ export type GetLibraryQueryError = ErrorType<unknown>
  */
 
 export function useGetLibrary<TData = Awaited<ReturnType<typeof getLibrary>>, TError = ErrorType<unknown>>(
- params: GetLibraryParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getLibrary>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getLibrary>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
-  const queryOptions = getGetLibraryQueryOptions(params,options)
+  const queryOptions = getGetLibraryQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
@@ -517,16 +507,14 @@ export const getToggleLikeUrl = (videoId: string,) => {
   return `/api/videos/${videoId}/like`
 }
 
-export const toggleLike = async (videoId: string,
-    interactionRequest: InteractionRequest, options?: RequestInit): Promise<InteractionResponse> => {
+export const toggleLike = async (videoId: string, options?: RequestInit): Promise<InteractionResponse> => {
 
   return customFetch<InteractionResponse>(getToggleLikeUrl(videoId),
   {
     ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      interactionRequest,)
+    method: 'POST'
+
+
   }
 );}
 
@@ -534,8 +522,8 @@ export const toggleLike = async (videoId: string,
 
 
 export const getToggleLikeMutationOptions = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof toggleLike>>, TError,{videoId: string;data: BodyType<InteractionRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof toggleLike>>, TError,{videoId: string;data: BodyType<InteractionRequest>}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof toggleLike>>, TError,{videoId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof toggleLike>>, TError,{videoId: string}, TContext> => {
 
 const mutationKey = ['toggleLike'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -547,10 +535,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof toggleLike>>, {videoId: string;data: BodyType<InteractionRequest>}> = (props) => {
-          const {videoId,data} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof toggleLike>>, {videoId: string}> = (props) => {
+          const {videoId} = props ?? {};
 
-          return  toggleLike(videoId,data,requestOptions)
+          return  toggleLike(videoId,requestOptions)
         }
 
 
@@ -561,15 +549,15 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type ToggleLikeMutationResult = NonNullable<Awaited<ReturnType<typeof toggleLike>>>
-    export type ToggleLikeMutationBody = BodyType<InteractionRequest>
+
     export type ToggleLikeMutationError = ErrorType<unknown>
 
     export const useToggleLike = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof toggleLike>>, TError,{videoId: string;data: BodyType<InteractionRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof toggleLike>>, TError,{videoId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof toggleLike>>,
         TError,
-        {videoId: string;data: BodyType<InteractionRequest>},
+        {videoId: string},
         TContext
       > => {
       return useMutation(getToggleLikeMutationOptions(options));
@@ -583,16 +571,14 @@ export const getToggleSaveUrl = (videoId: string,) => {
   return `/api/videos/${videoId}/save`
 }
 
-export const toggleSave = async (videoId: string,
-    interactionRequest: InteractionRequest, options?: RequestInit): Promise<InteractionResponse> => {
+export const toggleSave = async (videoId: string, options?: RequestInit): Promise<InteractionResponse> => {
 
   return customFetch<InteractionResponse>(getToggleSaveUrl(videoId),
   {
     ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      interactionRequest,)
+    method: 'POST'
+
+
   }
 );}
 
@@ -600,8 +586,8 @@ export const toggleSave = async (videoId: string,
 
 
 export const getToggleSaveMutationOptions = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof toggleSave>>, TError,{videoId: string;data: BodyType<InteractionRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof toggleSave>>, TError,{videoId: string;data: BodyType<InteractionRequest>}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof toggleSave>>, TError,{videoId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof toggleSave>>, TError,{videoId: string}, TContext> => {
 
 const mutationKey = ['toggleSave'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -613,10 +599,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof toggleSave>>, {videoId: string;data: BodyType<InteractionRequest>}> = (props) => {
-          const {videoId,data} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof toggleSave>>, {videoId: string}> = (props) => {
+          const {videoId} = props ?? {};
 
-          return  toggleSave(videoId,data,requestOptions)
+          return  toggleSave(videoId,requestOptions)
         }
 
 
@@ -627,15 +613,15 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type ToggleSaveMutationResult = NonNullable<Awaited<ReturnType<typeof toggleSave>>>
-    export type ToggleSaveMutationBody = BodyType<InteractionRequest>
+
     export type ToggleSaveMutationError = ErrorType<unknown>
 
     export const useToggleSave = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof toggleSave>>, TError,{videoId: string;data: BodyType<InteractionRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof toggleSave>>, TError,{videoId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof toggleSave>>,
         TError,
-        {videoId: string;data: BodyType<InteractionRequest>},
+        {videoId: string},
         TContext
       > => {
       return useMutation(getToggleSaveMutationOptions(options));
@@ -712,24 +698,17 @@ export const useCreatePurchase = <TError = ErrorType<unknown>,
       return useMutation(getCreatePurchaseMutationOptions(options));
     }
 
-export const getListMyPurchasesUrl = (params: ListMyPurchasesParams,) => {
-  const normalizedParams = new URLSearchParams();
+export const getListMyPurchasesUrl = () => {
 
-  Object.entries(params || {}).forEach(([key, value]) => {
 
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
-    }
-  });
 
-  const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/purchases/me?${stringifiedParams}` : `/api/purchases/me`
+  return `/api/purchases/me`
 }
 
-export const listMyPurchases = async (params: ListMyPurchasesParams, options?: RequestInit): Promise<Purchase[]> => {
+export const listMyPurchases = async ( options?: RequestInit): Promise<Purchase[]> => {
 
-  return customFetch<Purchase[]>(getListMyPurchasesUrl(params),
+  return customFetch<Purchase[]>(getListMyPurchasesUrl(),
   {
     ...options,
     method: 'GET'
@@ -742,23 +721,23 @@ export const listMyPurchases = async (params: ListMyPurchasesParams, options?: R
 
 
 
-export const getListMyPurchasesQueryKey = (params?: ListMyPurchasesParams,) => {
+export const getListMyPurchasesQueryKey = () => {
     return [
-    `/api/purchases/me`, ...(params ? [params] : [])
+    `/api/purchases/me`
     ] as const;
     }
 
 
-export const getListMyPurchasesQueryOptions = <TData = Awaited<ReturnType<typeof listMyPurchases>>, TError = ErrorType<unknown>>(params: ListMyPurchasesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listMyPurchases>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+export const getListMyPurchasesQueryOptions = <TData = Awaited<ReturnType<typeof listMyPurchases>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listMyPurchases>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getListMyPurchasesQueryKey(params);
+  const queryKey =  queryOptions?.queryKey ?? getListMyPurchasesQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listMyPurchases>>> = ({ signal }) => listMyPurchases(params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listMyPurchases>>> = ({ signal }) => listMyPurchases({ signal, ...requestOptions });
 
 
 
@@ -773,11 +752,11 @@ export type ListMyPurchasesQueryError = ErrorType<unknown>
 
 
 export function useListMyPurchases<TData = Awaited<ReturnType<typeof listMyPurchases>>, TError = ErrorType<unknown>>(
- params: ListMyPurchasesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listMyPurchases>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listMyPurchases>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
-  const queryOptions = getListMyPurchasesQueryOptions(params,options)
+  const queryOptions = getListMyPurchasesQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

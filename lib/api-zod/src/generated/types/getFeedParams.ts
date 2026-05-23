@@ -12,5 +12,4 @@ export type GetFeedParams = {
  * @maximum 50
  */
 limit?: number;
-userId?: string;
 };

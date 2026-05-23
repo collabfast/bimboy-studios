@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { BadgeCheck, Lock, Play } from "lucide-react";
 import { useGetLibrary, type FeedItem } from "@workspace/api-client-react";
-import { getUserId } from "../lib/session";
+import { AuthRequired } from "@/components/auth-required";
 
 function formatDuration(s: number) {
   const m = Math.floor(s / 60);
@@ -10,8 +10,15 @@ function formatDuration(s: number) {
 }
 
 export default function LibraryPage() {
-  const userId = getUserId();
-  const { data, isLoading, isError } = useGetLibrary({ userId });
+  return (
+    <AuthRequired>
+      <LibraryInner />
+    </AuthRequired>
+  );
+}
+
+function LibraryInner() {
+  const { data, isLoading, isError } = useGetLibrary();
   const items: FeedItem[] = data?.items ?? [];
 
   return (

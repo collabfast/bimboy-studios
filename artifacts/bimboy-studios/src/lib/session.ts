@@ -1,11 +1,18 @@
-const KEY = "bimboy_user_id";
+// Replaced by Supabase auth. Re-exports the current user id from the auth
+// context for callers that still need a synchronous lookup.
+//
+// Prefer importing `useAuth()` from "@/lib/auth" in React code.
 
-export function getUserId(): string {
-  if (typeof window === "undefined") return "u_anon";
-  let id = window.localStorage.getItem(KEY);
-  if (!id) {
-    id = "u_" + Math.random().toString(36).slice(2, 10);
-    window.localStorage.setItem(KEY, id);
-  }
-  return id;
+import { supabase } from "./supabase";
+
+/**
+ * Returns the current Supabase user id if a session exists, else null.
+ * This reads from the in-memory Supabase client; it does not trigger a fetch.
+ */
+export function getCurrentUserId(): string | null {
+  // supabase-js caches the session on the client after init; this is sync-safe
+  // once AuthProvider has mounted. For pre-mount calls it returns null.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const session = (supabase.auth as any).currentSession ?? null;
+  return session?.user?.id ?? null;
 }

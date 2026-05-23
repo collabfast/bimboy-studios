@@ -47,17 +47,12 @@ export interface FeedResponse {
   items: FeedItem[];
 }
 
-export interface InteractionRequest {
-  userId: string;
-}
-
 export interface InteractionResponse {
   active: boolean;
   count: number;
 }
 
 export interface PurchaseRequest {
-  userId: string;
   videoId: string;
 }
 
@@ -83,14 +78,5 @@ export type GetFeedParams = {
  * @maximum 50
  */
 limit?: number;
-userId?: string;
-};
-
-export type GetLibraryParams = {
-userId: string;
-};
-
-export type ListMyPurchasesParams = {
-userId: string;
 };
 

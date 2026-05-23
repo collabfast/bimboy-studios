@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
 import { db, likesTable, savesTable, videosTable } from "@workspace/db";
 import { and, eq, sql } from "drizzle-orm";
+import { requireAuth } from "../middleware/auth";
 
 const router: IRouter = Router();
 
@@ -49,28 +50,16 @@ async function toggle(
   };
 }
 
-router.post("/videos/:videoId/like", async (req, res) => {
-  // @ts-ignore
-  const videoId = req.params.videoId as string;
-  const userId = req.body?.userId as string;
-  if (!userId) {
-    res.status(400).json({ error: "userId required" });
-    return;
-  }
-  const out = await toggle(likesTable, videoId, userId, "likesCount");
+router.post("/videos/:videoId/like", requireAuth, async (req, res) => {
+  const videoId = req.params["videoId"] as string;
+  const out = await toggle(likesTable, videoId, req.userId!, "likesCount");
   if (!out) { res.status(404).json({ error: "Video not found" }); return; }
   res.json(out);
 });
 
-router.post("/videos/:videoId/save", async (req, res) => {
-  // @ts-ignore
-  const videoId = req.params.videoId as string;
-  const userId = req.body?.userId as string;
-  if (!userId) {
-    res.status(400).json({ error: "userId required" });
-    return;
-  }
-  const out = await toggle(savesTable, videoId, userId, "savesCount");
+router.post("/videos/:videoId/save", requireAuth, async (req, res) => {
+  const videoId = req.params["videoId"] as string;
+  const out = await toggle(savesTable, videoId, req.userId!, "savesCount");
   if (!out) { res.status(404).json({ error: "Video not found" }); return; }
   res.json(out);
 });

@@ -4,7 +4,7 @@ export default function AboutPage() {
   return (
     <PageShell
       eyebrow="About"
-      title="About BimBoy Studios"
+      title="About BimBoy — Share the fans and money you deserve"
       description="This route anchors the company and product story inside the same premium shell as the rest of the site."
     >
       <section className="page-shell mt-10 grid gap-5 md:grid-cols-3">

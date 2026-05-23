@@ -7,16 +7,12 @@ import {
 } from "@workspace/db";
 import { eq, desc } from "drizzle-orm";
 import { buildFeedItems } from "../lib/feed-items";
+import { requireAuth } from "../middleware/auth";
 
 const router: IRouter = Router();
 
-router.get("/library", async (req, res) => {
-  // @ts-ignore
-  const userId = typeof req.query.userId === "string" ? req.query.userId : "";
-  if (!userId) {
-    res.status(400).json({ error: "userId required" });
-    return;
-  }
+router.get("/library", requireAuth, async (req, res) => {
+  const userId = req.userId!;
   const rows = await db
     .select({ v: videosTable, c: creatorsTable })
     .from(purchasesTable)

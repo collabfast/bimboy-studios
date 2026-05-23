@@ -7,6 +7,5 @@
  */
 
 export interface PurchaseRequest {
-  userId: string;
   videoId: string;
 }

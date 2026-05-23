@@ -25,8 +25,7 @@ export const getFeedQueryLimitMax = 50;
 
 
 export const GetFeedQueryParams = zod.object({
-  "limit": zod.coerce.number().min(1).max(getFeedQueryLimitMax).default(getFeedQueryLimitDefault),
-  "userId": zod.coerce.string().optional()
+  "limit": zod.coerce.number().min(1).max(getFeedQueryLimitMax).default(getFeedQueryLimitDefault)
 })
 
 export const GetFeedResponse = zod.object({
@@ -142,10 +141,6 @@ export const GetCreatorVideosResponse = zod.object({
 /**
  * @summary Videos the user has unlocked
  */
-export const GetLibraryQueryParams = zod.object({
-  "userId": zod.coerce.string()
-})
-
 export const GetLibraryResponse = zod.object({
   "items": zod.array(zod.object({
   "id": zod.string(),
@@ -189,10 +184,6 @@ export const ToggleLikeParams = zod.object({
   "videoId": zod.coerce.string()
 })
 
-export const ToggleLikeBody = zod.object({
-  "userId": zod.string()
-})
-
 export const ToggleLikeResponse = zod.object({
   "active": zod.boolean(),
   "count": zod.number()
@@ -201,10 +192,6 @@ export const ToggleLikeResponse = zod.object({
 
 export const ToggleSaveParams = zod.object({
   "videoId": zod.coerce.string()
-})
-
-export const ToggleSaveBody = zod.object({
-  "userId": zod.string()
 })
 
 export const ToggleSaveResponse = zod.object({
@@ -217,7 +204,6 @@ export const ToggleSaveResponse = zod.object({
  * @summary Placeholder CCBill PPV purchase
  */
 export const CreatePurchaseBody = zod.object({
-  "userId": zod.string(),
   "videoId": zod.string()
 })
 
@@ -235,10 +221,6 @@ export const CreatePurchaseResponse = zod.object({
   "redirectUrl": zod.string()
 })
 
-
-export const ListMyPurchasesQueryParams = zod.object({
-  "userId": zod.coerce.string()
-})
 
 export const ListMyPurchasesResponseItem = zod.object({
   "id": zod.string(),

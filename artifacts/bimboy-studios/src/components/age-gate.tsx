@@ -28,7 +28,7 @@ export function AgeGate() {
   return (
     <div className="age-gate-backdrop" role="dialog" aria-modal="true">
       <div className="age-gate-card">
-        <div className="age-gate-brand">BIMBOY STUDIOS</div>
+        <div className="age-gate-brand">BIMBOY — SHARE THE FANS AND MONEY YOU DESERVE</div>
         <h2 className="age-gate-title">Adults only</h2>
         <p className="age-gate-body">
           This site contains adult content. You must be at least 18 years old

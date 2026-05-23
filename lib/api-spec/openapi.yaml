@@ -39,9 +39,6 @@ paths:
             minimum: 1
             maximum: 50
             default: 20
-        - in: query
-          name: userId
-          schema: { type: string }
       responses:
         "200":
           description: OK
@@ -99,11 +96,8 @@ paths:
       operationId: getLibrary
       tags: [purchases]
       summary: Videos the user has unlocked
-      parameters:
-        - in: query
-          name: userId
-          required: true
-          schema: { type: string }
+      security:
+        - bearerAuth: []
       responses:
         "200":
           description: OK
@@ -114,16 +108,13 @@ paths:
     post:
       operationId: toggleLike
       tags: [interactions]
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: videoId
           required: true
           schema: { type: string }
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: "#/components/schemas/InteractionRequest" }
       responses:
         "200":
           description: OK
@@ -134,16 +125,13 @@ paths:
     post:
       operationId: toggleSave
       tags: [interactions]
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: videoId
           required: true
           schema: { type: string }
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: "#/components/schemas/InteractionRequest" }
       responses:
         "200":
           description: OK
@@ -155,6 +143,8 @@ paths:
       operationId: createPurchase
       tags: [purchases]
       summary: Placeholder CCBill PPV purchase
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -170,11 +160,8 @@ paths:
     get:
       operationId: listMyPurchases
       tags: [purchases]
-      parameters:
-        - in: query
-          name: userId
-          required: true
-          schema: { type: string }
+      security:
+        - bearerAuth: []
       responses:
         "200":
           description: OK
@@ -184,6 +171,11 @@ paths:
                 type: array
                 items: { $ref: "#/components/schemas/Purchase" }
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     HealthStatus:
       type: object
@@ -252,11 +244,6 @@ components:
         items:
           type: array
           items: { $ref: "#/components/schemas/FeedItem" }
-    InteractionRequest:
-      type: object
-      required: [userId]
-      properties:
-        userId: { type: string }
     InteractionResponse:
       type: object
       required: [active, count]
@@ -265,9 +252,8 @@ components:
         count: { type: integer }
     PurchaseRequest:
       type: object
-      required: [userId, videoId]
+      required: [videoId]
       properties:
-        userId: { type: string }
         videoId: { type: string }
     Purchase:
       type: object

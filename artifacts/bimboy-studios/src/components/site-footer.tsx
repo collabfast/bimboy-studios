@@ -13,7 +13,7 @@ export function SiteFooter() {
     <footer className="border-t border-white/8 bg-black/40">
       <div className="page-shell flex flex-col gap-6 py-10 md:flex-row md:items-center md:justify-between">
         <div>
-          <p className="text-lg font-semibold text-white">BimBoy Studios</p>
+          <p className="text-lg font-semibold text-white">BimBoy — Share the fans and money you deserve</p>
           <p className="mt-2 max-w-xl text-sm leading-7 text-white/55">
             Complete baseline scaffold for the platform, ready for phased
             product and content implementation.

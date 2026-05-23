@@ -81,7 +81,7 @@ export default function BrowsePage() {
     <PageShell
       eyebrow="Browse"
       title="Discover premium releases, standout scenes, and featured talent."
-      description="Explore the BimBoy Studios library through cinematic drops, cast-led discovery, and polished release presentation."
+      description="Explore the BimBoy — Share the fans and money you deserve library through cinematic drops, cast-led discovery, and polished release presentation."
     >
       <section className="page-shell mt-10">
         <div className="surface-card rounded-[36px] px-6 py-8 sm:px-8 sm:py-10">

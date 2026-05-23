@@ -34,7 +34,8 @@ import {
   getGetFeedQueryKey,
   type FeedItem,
 } from "@workspace/api-client-react";
-import { getUserId } from "@/lib/session";
+import { useLocation } from "wouter";
+import { useAuth } from "@/lib/auth";
 
 function formatCount(n: number) {
   if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + "M";
@@ -66,10 +67,18 @@ function useMediaQuery(query: string) {
 type Toast = { id: number; text: string; tone: "save" | "like" | "info" };
 
 export function SwipeFeed() {
-  const userId = useMemo(() => getUserId(), []);
+  const { user } = useAuth();
+  const [, navigate] = useLocation();
   const qc = useQueryClient();
-  const params = { limit: 20, userId };
+  const params = { limit: 20 };
   const feedKey = getGetFeedQueryKey(params);
+
+  const requireSignIn = useCallback(
+    (action: string) => {
+      navigate(`/login?next=/&action=${encodeURIComponent(action)}`);
+    },
+    [navigate],
+  );
 
   const { data, isLoading, isError, refetch } = useGetFeed(params, {
     query: { queryKey: feedKey },
@@ -130,6 +139,7 @@ export function SwipeFeed() {
 
   const toggleLike = useCallback(
     (item: FeedItem) => {
+      if (!user) { requireSignIn("like"); return; }
       const willActivate = !item.liked;
       patchItem(item.id, {
         liked: willActivate,
@@ -137,7 +147,7 @@ export function SwipeFeed() {
       });
       pushToast(willActivate ? "Liked" : "Unliked", "like");
       likeMutation.mutate(
-        { videoId: item.id, data: { userId } },
+        { videoId: item.id },
         {
           onSuccess: (resp) =>
             patchItem(item.id, { liked: resp.active, likesCount: resp.count }),
@@ -149,11 +159,12 @@ export function SwipeFeed() {
         },
       );
     },
-    [likeMutation, patchItem, pushToast, userId],
+    [likeMutation, patchItem, pushToast, user, requireSignIn],
   );
 
   const toggleSave = useCallback(
     (item: FeedItem) => {
+      if (!user) { requireSignIn("save"); return; }
       const willActivate = !item.saved;
       patchItem(item.id, {
         saved: willActivate,
@@ -161,7 +172,7 @@ export function SwipeFeed() {
       });
       pushToast(willActivate ? "Saved to watchlist" : "Removed", "save");
       saveMutation.mutate(
-        { videoId: item.id, data: { userId } },
+        { videoId: item.id },
         {
           onSuccess: (resp) =>
             patchItem(item.id, { saved: resp.active, savesCount: resp.count }),
@@ -173,19 +184,23 @@ export function SwipeFeed() {
         },
       );
     },
-    [saveMutation, patchItem, pushToast, userId],
+    [saveMutation, patchItem, pushToast, user, requireSignIn],
   );
 
-  const openUnlock = useCallback((item: FeedItem | undefined) => {
-    if (!item || item.unlocked) return;
-    setUnlockOpen(item);
-  }, []);
+  const openUnlock = useCallback(
+    (item: FeedItem | undefined) => {
+      if (!item || item.unlocked) return;
+      if (!user) { requireSignIn("unlock"); return; }
+      setUnlockOpen(item);
+    },
+    [user, requireSignIn],
+  );
 
   const confirmUnlock = useCallback(() => {
     if (!unlockOpen) return;
     const item = unlockOpen;
     purchaseMutation.mutate(
-      { data: { userId, videoId: item.id } },
+      { data: { videoId: item.id } },
       {
         onSuccess: () => {
           patchItem(item.id, { unlocked: true });
@@ -200,7 +215,7 @@ export function SwipeFeed() {
         },
       },
     );
-  }, [unlockOpen, purchaseMutation, patchItem, pushToast, userId]);
+  }, [unlockOpen, purchaseMutation, patchItem, pushToast]);
 
   // keyboard navigation
   useEffect(() => {

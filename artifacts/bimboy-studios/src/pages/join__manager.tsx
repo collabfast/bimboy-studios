@@ -5,7 +5,7 @@ export default function JoinManagerPage() {
     <PageShell
       eyebrow="Join Beta"
       title="Apply as Manager"
-      description="Step into a management role centered on creator development, studio coordination, and premium release oversight across the BimBoy Studios platform."
+      description="Step into a management role centered on creator development, studio coordination, and premium release oversight across the BimBoy — Share the fans and money you deserve platform."
     >
       <section className="page-shell mt-10 grid gap-5 md:grid-cols-3">
         {[

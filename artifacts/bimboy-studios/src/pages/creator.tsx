@@ -6,7 +6,7 @@ import {
   useGetLibrary,
   type FeedItem,
 } from "@workspace/api-client-react";
-import { getUserId } from "../lib/session";
+import { useAuth } from "@/lib/auth";
 
 function formatDuration(s: number) {
   const m = Math.floor(s / 60);
@@ -17,11 +17,13 @@ function formatDuration(s: number) {
 export default function CreatorPage() {
   const params = useParams<{ handle: string }>();
   const handle = params.handle ?? "";
-  const userId = getUserId();
+  const { user } = useAuth();
 
   const { data: creator, isLoading, isError } = useGetCreator(handle);
   const { data: feed } = useGetCreatorVideos(handle);
-  const { data: library } = useGetLibrary({ userId });
+  const { data: library } = useGetLibrary({
+    query: { enabled: !!user, queryKey: ["getLibrary"] },
+  });
 
   const unlocked = new Set((library?.items ?? []).map((i) => i.id));
   const videos: FeedItem[] = (feed?.items ?? []).map((v) => ({

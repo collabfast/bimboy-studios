@@ -2,14 +2,15 @@ import { Router, type IRouter } from "express";
 import { db, purchasesTable, videosTable } from "@workspace/db";
 import { and, eq } from "drizzle-orm";
 import { randomUUID } from "crypto";
+import { requireAuth } from "../middleware/auth";
 
 const router: IRouter = Router();
 
-router.post("/purchases", async (req, res) => {
-  const userId = req.body?.userId as string;
+router.post("/purchases", requireAuth, async (req, res) => {
+  const userId = req.userId!;
   const videoId = req.body?.videoId as string;
-  if (!userId || !videoId) {
-    res.status(400).json({ error: "userId and videoId required" });
+  if (!videoId) {
+    res.status(400).json({ error: "videoId required" });
     return;
   }
 
@@ -64,13 +65,8 @@ router.post("/purchases", async (req, res) => {
   });
 });
 
-router.get("/purchases/me", async (req, res) => {
-  // @ts-ignore
-  const userId = req.query.userId as string;
-  if (!userId) {
-    res.status(400).json({ error: "userId required" });
-    return;
-  }
+router.get("/purchases/me", requireAuth, async (req, res) => {
+  const userId = req.userId!;
   const rows = await db
     .select()
     .from(purchasesTable)

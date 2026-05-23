@@ -41,7 +41,7 @@ export function SiteHeader() {
       <div className="page-shell flex items-center justify-between gap-6 py-5">
         <div className="flex items-center gap-6">
           <Link href="/" className="text-xl font-black tracking-[0.08em] text-white">
-            BimBoy Studios
+            BimBoy — Share the fans and money you deserve
           </Link>
           <nav className="hidden items-center gap-2 lg:flex">
             {siteNavigation.map((item) => {
