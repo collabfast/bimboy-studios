@@ -703,6 +703,13 @@ main {
 }
 .swipe-viewer-expand:hover { background: rgba(255,255,255,0.16); }
 .swipe-viewer-backdrop.is-expanded { padding: 0; }
+.swipe-viewer-frame.is-landscape {
+  width: min(1200px, 92vw);
+  height: auto;
+  max-height: 86vh;
+  aspect-ratio: 16 / 9;
+}
+.swipe-viewer-frame.is-landscape .swipe-video { object-fit: contain; background: #000; }
 .swipe-viewer-frame.is-expanded {
   width: 100vw;
   height: 100vh;
@@ -712,6 +719,7 @@ main {
   border-radius: 0;
   box-shadow: none;
 }
+.swipe-viewer-frame.is-expanded.is-landscape .swipe-video { object-fit: contain; }
 .swipe-viewer-backdrop.is-expanded .swipe-viewer-nav-prev { left: 24px; }
 .swipe-viewer-backdrop.is-expanded .swipe-viewer-nav-next { right: 24px; }
 .swipe-viewer-nav {

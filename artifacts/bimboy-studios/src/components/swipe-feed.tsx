@@ -917,7 +917,7 @@ function ViewerOverlay(
         <ChevronRight className="h-6 w-6" />
       </button>
       <motion.div
-        className={`swipe-viewer-frame ${expanded ? "is-expanded" : ""}`}
+        className={`swipe-viewer-frame ${expanded ? "is-expanded" : ""} ${cardProps.item.unlocked ? "is-landscape" : ""}`}
         initial={{ scale: 0.96, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.96, opacity: 0 }}
