@@ -156,6 +156,16 @@ export default function LoginPage() {
         <p className="mt-4 text-center text-[11px] text-white/40">
           By continuing you confirm you are 18+ and agree to our terms.
         </p>
+
+        <div className="mt-4 border-t border-white/10 pt-4 text-center">
+          <button
+            type="button"
+            onClick={() => navigate("/admin")}
+            className="text-xs font-medium text-white/50 underline-offset-4 transition hover:text-pink-300 hover:underline"
+          >
+            Admin login
+          </button>
+        </div>
       </div>
     </div>
   );
