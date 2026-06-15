@@ -96,6 +96,8 @@ export async function buildFeedItems(
     likesCount: v.likesCount,
     savesCount: v.savesCount,
     tags: v.tags ?? [],
+    postType: v.postType,
+    createdAt: v.createdAt.toISOString(),
     creator: toCreatorDto(c),
     participants: (partsByVideo.get(v.id) ?? []).sort(
       (a, b) => b.splitBps - a.splitBps,

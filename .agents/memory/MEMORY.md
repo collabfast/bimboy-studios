@@ -1,3 +1,1 @@
-- [api-server build/restart](api-server-dev-loop.md) — dev workflow bundles on startup; restart the workflow before smoke-testing edits, and curl port 8080 with the /api prefix.
-- [Orval zod param collision](orval-param-collision.md) — an op with BOTH path + query params collides on `<Op>Params`; avoid by using only one param style per op.
-- [Revenue ledger invariant](revenue-ledger.md) — purchase + earnings fan-out must be one DB transaction; rounding remainder always goes to platform so rows reconcile to the charge.
+- [Orval query hooks](orval-query-hooks.md) — passing options.query to generated useGetX hooks needs an explicit queryKey or tsc (not LSP) fails; bimboy build needs PORT+BASE_PATH.

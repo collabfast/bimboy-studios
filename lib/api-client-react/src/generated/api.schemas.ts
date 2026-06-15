@@ -36,6 +36,9 @@ export interface FeedItem {
   likesCount: number;
   savesCount: number;
   tags: string[];
+  /** "creator" (platform takes 20%) or "studio" (platform takes 33%). */
+  postType: string;
+  createdAt: string;
   creator: Creator;
   participants: Participant[];
   unlocked: boolean;

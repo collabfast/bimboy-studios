@@ -112,42 +112,37 @@ export const dashboardNavigation: DashboardNavItem[] = [
   {
     href: "/dashboard",
     label: "Overview",
-    description: "Creator home for uploads, publishing, and profile activity.",
-  },
-  {
-    href: "/dashboard/profile",
-    label: "Profile",
-    description: "Starter settings for identity, banner, and bio modules.",
-  },
-  {
-    href: "/dashboard/content",
-    label: "Content",
-    description: "Creator content hub for uploads, library visibility, and status.",
-  },
-  {
-    href: "/dashboard/uploads",
-    label: "Uploads",
-    description: "Submit new long-form videos and track transfer progress.",
+    description: "Live summary of content, revenue, and rankings.",
   },
   {
     href: "/dashboard/videos",
     label: "My Videos",
-    description: "Manage creator uploads across draft, processing, and live states.",
+    description: "Creator posts with per-post revenue splits and conversion.",
+  },
+  {
+    href: "/dashboard/exclusives",
+    label: "Exclusives",
+    description: "Studio-produced releases with the 33% studio share.",
+  },
+  {
+    href: "/dashboard/consent",
+    label: "Consent Forms",
+    description: "Upload and review signed consent paperwork per release.",
+  },
+  {
+    href: "/dashboard/analytics",
+    label: "Analytics",
+    description: "Revenue and conversion performance across content.",
+  },
+  {
+    href: "/dashboard/ranking",
+    label: "Model Ranking",
+    description: "Top creators by revenue for any period.",
   },
   {
     href: "/dashboard/earnings",
     label: "Earnings",
-    description: "Placeholder payouts and revenue summary view.",
-  },
-  {
-    href: "/dashboard/royalties",
-    label: "Royalties",
-    description: "Reserved for split logic, statements, and transparency tools.",
-  },
-  {
-    href: "/dashboard/settings",
-    label: "Settings",
-    description: "Account and workflow preferences shell.",
+    description: "Balance, earnings by post, and payout history.",
   },
 ];
 

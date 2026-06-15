@@ -41,6 +41,8 @@ export const GetFeedResponse = zod.object({
   "likesCount": zod.number(),
   "savesCount": zod.number(),
   "tags": zod.array(zod.string()),
+  "postType": zod.string().describe('\"creator\" (platform takes 20%) or \"studio\" (platform takes 33%).'),
+  "createdAt": zod.coerce.date(),
   "creator": zod.object({
   "id": zod.string(),
   "handle": zod.string(),
@@ -112,6 +114,8 @@ export const GetCreatorVideosResponse = zod.object({
   "likesCount": zod.number(),
   "savesCount": zod.number(),
   "tags": zod.array(zod.string()),
+  "postType": zod.string().describe('\"creator\" (platform takes 20%) or \"studio\" (platform takes 33%).'),
+  "createdAt": zod.coerce.date(),
   "creator": zod.object({
   "id": zod.string(),
   "handle": zod.string(),
@@ -154,6 +158,8 @@ export const GetLibraryResponse = zod.object({
   "likesCount": zod.number(),
   "savesCount": zod.number(),
   "tags": zod.array(zod.string()),
+  "postType": zod.string().describe('\"creator\" (platform takes 20%) or \"studio\" (platform takes 33%).'),
+  "createdAt": zod.coerce.date(),
   "creator": zod.object({
   "id": zod.string(),
   "handle": zod.string(),

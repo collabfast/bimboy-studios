@@ -479,6 +479,8 @@ components:
         - likesCount
         - savesCount
         - tags
+        - postType
+        - createdAt
         - creator
         - participants
         - unlocked
@@ -498,6 +500,10 @@ components:
         tags:
           type: array
           items: { type: string }
+        postType:
+          type: string
+          description: '"creator" (platform takes 20%) or "studio" (platform takes 33%).'
+        createdAt: { type: string, format: date-time }
         creator: { $ref: "#/components/schemas/Creator" }
         participants:
           type: array

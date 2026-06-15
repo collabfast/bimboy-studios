@@ -24,6 +24,10 @@ import Page_dashboard__content from "./pages/dashboard__content";
 import Page_dashboard__profile from "./pages/dashboard__profile";
 import Page_dashboard__uploads from "./pages/dashboard__uploads";
 import Page_dashboard__videos from "./pages/dashboard__videos";
+import Page_dashboard__exclusives from "./pages/dashboard__exclusives";
+import Page_dashboard__consent from "./pages/dashboard__consent";
+import Page_dashboard__analytics from "./pages/dashboard__analytics";
+import Page_dashboard__ranking from "./pages/dashboard__ranking";
 import Page_admin__royalties from "./pages/admin__royalties";
 import Page_admin__creators from "./pages/admin__creators";
 import Page_admin__reports from "./pages/admin__reports";
@@ -105,6 +109,10 @@ import Page__slug_ from "./pages/_slug_";
         <Route path="/dashboard/profile"><Layout_dashboard><Page_dashboard__profile /></Layout_dashboard></Route>
         <Route path="/dashboard/uploads"><Layout_dashboard><Page_dashboard__uploads /></Layout_dashboard></Route>
         <Route path="/dashboard/videos"><Layout_dashboard><Page_dashboard__videos /></Layout_dashboard></Route>
+        <Route path="/dashboard/exclusives"><Layout_dashboard><Page_dashboard__exclusives /></Layout_dashboard></Route>
+        <Route path="/dashboard/consent"><Layout_dashboard><Page_dashboard__consent /></Layout_dashboard></Route>
+        <Route path="/dashboard/analytics"><Layout_dashboard><Page_dashboard__analytics /></Layout_dashboard></Route>
+        <Route path="/dashboard/ranking"><Layout_dashboard><Page_dashboard__ranking /></Layout_dashboard></Route>
         <Route path="/admin/royalties"><Layout_admin><Page_admin__royalties /></Layout_admin></Route>
         <Route path="/admin/creators"><Layout_admin><Page_admin__creators /></Layout_admin></Route>
         <Route path="/admin/reports"><Layout_admin><Page_admin__reports /></Layout_admin></Route>
