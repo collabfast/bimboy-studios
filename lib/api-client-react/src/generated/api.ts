@@ -20,14 +20,29 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  ConsentDocument,
+  ConsentDocumentRequest,
   Creator,
+  CreatorEarnings,
+  CreatorRanking,
+  ErrorEnvelope,
   FeedResponse,
+  GetCreatorRankingsParams,
   GetFeedParams,
+  GetVideoStatsParams,
   HealthStatus,
   InteractionResponse,
+  OkResponse,
+  Payout,
+  PayoutCreated,
+  PayoutRequest,
   Purchase,
   PurchaseRequest,
-  PurchaseResponse
+  PurchaseResponse,
+  UploadUrlRequest,
+  UploadUrlResponse,
+  VideoEventRequest,
+  VideoStats
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -757,6 +772,849 @@ export function useListMyPurchases<TData = Awaited<ReturnType<typeof listMyPurch
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getListMyPurchasesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getTrackVideoEventUrl = (videoId: string,) => {
+
+
+
+
+  return `/api/videos/${videoId}/events`
+}
+
+/**
+ * @summary Log a teaser click or view event
+ */
+export const trackVideoEvent = async (videoId: string,
+    videoEventRequest: VideoEventRequest, options?: RequestInit): Promise<OkResponse> => {
+
+  return customFetch<OkResponse>(getTrackVideoEventUrl(videoId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      videoEventRequest,)
+  }
+);}
+
+
+
+
+export const getTrackVideoEventMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof trackVideoEvent>>, TError,{videoId: string;data: BodyType<VideoEventRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof trackVideoEvent>>, TError,{videoId: string;data: BodyType<VideoEventRequest>}, TContext> => {
+
+const mutationKey = ['trackVideoEvent'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof trackVideoEvent>>, {videoId: string;data: BodyType<VideoEventRequest>}> = (props) => {
+          const {videoId,data} = props ?? {};
+
+          return  trackVideoEvent(videoId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type TrackVideoEventMutationResult = NonNullable<Awaited<ReturnType<typeof trackVideoEvent>>>
+    export type TrackVideoEventMutationBody = BodyType<VideoEventRequest>
+    export type TrackVideoEventMutationError = ErrorType<void>
+
+    /**
+ * @summary Log a teaser click or view event
+ */
+export const useTrackVideoEvent = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof trackVideoEvent>>, TError,{videoId: string;data: BodyType<VideoEventRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof trackVideoEvent>>,
+        TError,
+        {videoId: string;data: BodyType<VideoEventRequest>},
+        TContext
+      > => {
+      return useMutation(getTrackVideoEventMutationOptions(options));
+    }
+
+export const getGetVideoStatsUrl = (params: GetVideoStatsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/videos/stats?${stringifiedParams}` : `/api/videos/stats`
+}
+
+/**
+ * @summary Funnel and revenue stats for one video
+ */
+export const getVideoStats = async (params: GetVideoStatsParams, options?: RequestInit): Promise<VideoStats> => {
+
+  return customFetch<VideoStats>(getGetVideoStatsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetVideoStatsQueryKey = (params?: GetVideoStatsParams,) => {
+    return [
+    `/api/videos/stats`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetVideoStatsQueryOptions = <TData = Awaited<ReturnType<typeof getVideoStats>>, TError = ErrorType<unknown>>(params: GetVideoStatsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getVideoStats>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetVideoStatsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getVideoStats>>> = ({ signal }) => getVideoStats(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getVideoStats>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetVideoStatsQueryResult = NonNullable<Awaited<ReturnType<typeof getVideoStats>>>
+export type GetVideoStatsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Funnel and revenue stats for one video
+ */
+
+export function useGetVideoStats<TData = Awaited<ReturnType<typeof getVideoStats>>, TError = ErrorType<unknown>>(
+ params: GetVideoStatsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getVideoStats>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetVideoStatsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetCreatorEarningsUrl = (handle: string,) => {
+
+
+
+
+  return `/api/creators/${handle}/earnings`
+}
+
+/**
+ * @summary Lifetime and available balance with per-video breakdown
+ */
+export const getCreatorEarnings = async (handle: string, options?: RequestInit): Promise<CreatorEarnings> => {
+
+  return customFetch<CreatorEarnings>(getGetCreatorEarningsUrl(handle),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCreatorEarningsQueryKey = (handle: string,) => {
+    return [
+    `/api/creators/${handle}/earnings`
+    ] as const;
+    }
+
+
+export const getGetCreatorEarningsQueryOptions = <TData = Awaited<ReturnType<typeof getCreatorEarnings>>, TError = ErrorType<void>>(handle: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCreatorEarnings>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCreatorEarningsQueryKey(handle);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCreatorEarnings>>> = ({ signal }) => getCreatorEarnings(handle, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(handle), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCreatorEarnings>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetCreatorEarningsQueryResult = NonNullable<Awaited<ReturnType<typeof getCreatorEarnings>>>
+export type GetCreatorEarningsQueryError = ErrorType<void>
+
+
+/**
+ * @summary Lifetime and available balance with per-video breakdown
+ */
+
+export function useGetCreatorEarnings<TData = Awaited<ReturnType<typeof getCreatorEarnings>>, TError = ErrorType<void>>(
+ handle: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCreatorEarnings>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetCreatorEarningsQueryOptions(handle,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getListCreatorPayoutsUrl = (handle: string,) => {
+
+
+
+
+  return `/api/creators/${handle}/payouts`
+}
+
+/**
+ * @summary Payout history for a creator
+ */
+export const listCreatorPayouts = async (handle: string, options?: RequestInit): Promise<Payout[]> => {
+
+  return customFetch<Payout[]>(getListCreatorPayoutsUrl(handle),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListCreatorPayoutsQueryKey = (handle: string,) => {
+    return [
+    `/api/creators/${handle}/payouts`
+    ] as const;
+    }
+
+
+export const getListCreatorPayoutsQueryOptions = <TData = Awaited<ReturnType<typeof listCreatorPayouts>>, TError = ErrorType<void>>(handle: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCreatorPayouts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListCreatorPayoutsQueryKey(handle);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listCreatorPayouts>>> = ({ signal }) => listCreatorPayouts(handle, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(handle), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listCreatorPayouts>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListCreatorPayoutsQueryResult = NonNullable<Awaited<ReturnType<typeof listCreatorPayouts>>>
+export type ListCreatorPayoutsQueryError = ErrorType<void>
+
+
+/**
+ * @summary Payout history for a creator
+ */
+
+export function useListCreatorPayouts<TData = Awaited<ReturnType<typeof listCreatorPayouts>>, TError = ErrorType<void>>(
+ handle: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCreatorPayouts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListCreatorPayoutsQueryOptions(handle,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getRequestCreatorPayoutUrl = (handle: string,) => {
+
+
+
+
+  return `/api/creators/${handle}/payouts`
+}
+
+/**
+ * @summary Request a payout of the available balance
+ */
+export const requestCreatorPayout = async (handle: string,
+    payoutRequest?: PayoutRequest, options?: RequestInit): Promise<PayoutCreated> => {
+
+  return customFetch<PayoutCreated>(getRequestCreatorPayoutUrl(handle),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      payoutRequest,)
+  }
+);}
+
+
+
+
+export const getRequestCreatorPayoutMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestCreatorPayout>>, TError,{handle: string;data?: BodyType<PayoutRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof requestCreatorPayout>>, TError,{handle: string;data?: BodyType<PayoutRequest>}, TContext> => {
+
+const mutationKey = ['requestCreatorPayout'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestCreatorPayout>>, {handle: string;data?: BodyType<PayoutRequest>}> = (props) => {
+          const {handle,data} = props ?? {};
+
+          return  requestCreatorPayout(handle,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RequestCreatorPayoutMutationResult = NonNullable<Awaited<ReturnType<typeof requestCreatorPayout>>>
+    export type RequestCreatorPayoutMutationBody = BodyType<PayoutRequest> | undefined
+    export type RequestCreatorPayoutMutationError = ErrorType<void>
+
+    /**
+ * @summary Request a payout of the available balance
+ */
+export const useRequestCreatorPayout = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestCreatorPayout>>, TError,{handle: string;data?: BodyType<PayoutRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof requestCreatorPayout>>,
+        TError,
+        {handle: string;data?: BodyType<PayoutRequest>},
+        TContext
+      > => {
+      return useMutation(getRequestCreatorPayoutMutationOptions(options));
+    }
+
+export const getGetCreatorRankingsUrl = (params?: GetCreatorRankingsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/rankings/creators?${stringifiedParams}` : `/api/rankings/creators`
+}
+
+/**
+ * @summary Leaderboard of creators by earnings
+ */
+export const getCreatorRankings = async (params?: GetCreatorRankingsParams, options?: RequestInit): Promise<CreatorRanking[]> => {
+
+  return customFetch<CreatorRanking[]>(getGetCreatorRankingsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCreatorRankingsQueryKey = (params?: GetCreatorRankingsParams,) => {
+    return [
+    `/api/rankings/creators`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetCreatorRankingsQueryOptions = <TData = Awaited<ReturnType<typeof getCreatorRankings>>, TError = ErrorType<unknown>>(params?: GetCreatorRankingsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCreatorRankings>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCreatorRankingsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCreatorRankings>>> = ({ signal }) => getCreatorRankings(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCreatorRankings>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetCreatorRankingsQueryResult = NonNullable<Awaited<ReturnType<typeof getCreatorRankings>>>
+export type GetCreatorRankingsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Leaderboard of creators by earnings
+ */
+
+export function useGetCreatorRankings<TData = Awaited<ReturnType<typeof getCreatorRankings>>, TError = ErrorType<unknown>>(
+ params?: GetCreatorRankingsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCreatorRankings>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetCreatorRankingsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getListConsentDocumentsUrl = (videoId: string,) => {
+
+
+
+
+  return `/api/videos/${videoId}/consent-documents`
+}
+
+/**
+ * @summary List consent documents for a video
+ */
+export const listConsentDocuments = async (videoId: string, options?: RequestInit): Promise<ConsentDocument[]> => {
+
+  return customFetch<ConsentDocument[]>(getListConsentDocumentsUrl(videoId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListConsentDocumentsQueryKey = (videoId: string,) => {
+    return [
+    `/api/videos/${videoId}/consent-documents`
+    ] as const;
+    }
+
+
+export const getListConsentDocumentsQueryOptions = <TData = Awaited<ReturnType<typeof listConsentDocuments>>, TError = ErrorType<unknown>>(videoId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listConsentDocuments>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListConsentDocumentsQueryKey(videoId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listConsentDocuments>>> = ({ signal }) => listConsentDocuments(videoId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(videoId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listConsentDocuments>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListConsentDocumentsQueryResult = NonNullable<Awaited<ReturnType<typeof listConsentDocuments>>>
+export type ListConsentDocumentsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List consent documents for a video
+ */
+
+export function useListConsentDocuments<TData = Awaited<ReturnType<typeof listConsentDocuments>>, TError = ErrorType<unknown>>(
+ videoId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listConsentDocuments>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListConsentDocumentsQueryOptions(videoId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateConsentDocumentUrl = (videoId: string,) => {
+
+
+
+
+  return `/api/videos/${videoId}/consent-documents`
+}
+
+/**
+ * @summary Record a consent document after upload
+ */
+export const createConsentDocument = async (videoId: string,
+    consentDocumentRequest: ConsentDocumentRequest, options?: RequestInit): Promise<ConsentDocument> => {
+
+  return customFetch<ConsentDocument>(getCreateConsentDocumentUrl(videoId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      consentDocumentRequest,)
+  }
+);}
+
+
+
+
+export const getCreateConsentDocumentMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createConsentDocument>>, TError,{videoId: string;data: BodyType<ConsentDocumentRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createConsentDocument>>, TError,{videoId: string;data: BodyType<ConsentDocumentRequest>}, TContext> => {
+
+const mutationKey = ['createConsentDocument'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createConsentDocument>>, {videoId: string;data: BodyType<ConsentDocumentRequest>}> = (props) => {
+          const {videoId,data} = props ?? {};
+
+          return  createConsentDocument(videoId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateConsentDocumentMutationResult = NonNullable<Awaited<ReturnType<typeof createConsentDocument>>>
+    export type CreateConsentDocumentMutationBody = BodyType<ConsentDocumentRequest>
+    export type CreateConsentDocumentMutationError = ErrorType<void>
+
+    /**
+ * @summary Record a consent document after upload
+ */
+export const useCreateConsentDocument = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createConsentDocument>>, TError,{videoId: string;data: BodyType<ConsentDocumentRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createConsentDocument>>,
+        TError,
+        {videoId: string;data: BodyType<ConsentDocumentRequest>},
+        TContext
+      > => {
+      return useMutation(getCreateConsentDocumentMutationOptions(options));
+    }
+
+export const getRequestUploadUrlUrl = () => {
+
+
+
+
+  return `/api/storage/uploads/request-url`
+}
+
+/**
+ * Returns a presigned GCS URL for direct upload. The client sends JSON
+metadata here, then uploads the file directly to the returned URL.
+
+ * @summary Request a presigned URL for file upload
+ */
+export const requestUploadUrl = async (uploadUrlRequest: UploadUrlRequest, options?: RequestInit): Promise<UploadUrlResponse> => {
+
+  return customFetch<UploadUrlResponse>(getRequestUploadUrlUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      uploadUrlRequest,)
+  }
+);}
+
+
+
+
+export const getRequestUploadUrlMutationOptions = <TError = ErrorType<ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestUploadUrl>>, TError,{data: BodyType<UploadUrlRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof requestUploadUrl>>, TError,{data: BodyType<UploadUrlRequest>}, TContext> => {
+
+const mutationKey = ['requestUploadUrl'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestUploadUrl>>, {data: BodyType<UploadUrlRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  requestUploadUrl(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RequestUploadUrlMutationResult = NonNullable<Awaited<ReturnType<typeof requestUploadUrl>>>
+    export type RequestUploadUrlMutationBody = BodyType<UploadUrlRequest>
+    export type RequestUploadUrlMutationError = ErrorType<ErrorEnvelope>
+
+    /**
+ * @summary Request a presigned URL for file upload
+ */
+export const useRequestUploadUrl = <TError = ErrorType<ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestUploadUrl>>, TError,{data: BodyType<UploadUrlRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof requestUploadUrl>>,
+        TError,
+        {data: BodyType<UploadUrlRequest>},
+        TContext
+      > => {
+      return useMutation(getRequestUploadUrlMutationOptions(options));
+    }
+
+export const getGetPublicObjectUrl = (filePath: string,) => {
+
+
+
+
+  return `/api/storage/public-objects/${filePath}`
+}
+
+/**
+ * @summary Serve a public asset from PUBLIC_OBJECT_SEARCH_PATHS
+ */
+export const getPublicObject = async (filePath: string, options?: RequestInit): Promise<Blob> => {
+
+  return customFetch<Blob>(getGetPublicObjectUrl(filePath),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPublicObjectQueryKey = (filePath: string,) => {
+    return [
+    `/api/storage/public-objects/${filePath}`
+    ] as const;
+    }
+
+
+export const getGetPublicObjectQueryOptions = <TData = Awaited<ReturnType<typeof getPublicObject>>, TError = ErrorType<ErrorEnvelope>>(filePath: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicObject>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPublicObjectQueryKey(filePath);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPublicObject>>> = ({ signal }) => getPublicObject(filePath, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(filePath), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPublicObject>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPublicObjectQueryResult = NonNullable<Awaited<ReturnType<typeof getPublicObject>>>
+export type GetPublicObjectQueryError = ErrorType<ErrorEnvelope>
+
+
+/**
+ * @summary Serve a public asset from PUBLIC_OBJECT_SEARCH_PATHS
+ */
+
+export function useGetPublicObject<TData = Awaited<ReturnType<typeof getPublicObject>>, TError = ErrorType<ErrorEnvelope>>(
+ filePath: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicObject>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPublicObjectQueryOptions(filePath,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetStorageObjectUrl = (objectPath: string,) => {
+
+
+
+
+  return `/api/storage/objects/${objectPath}`
+}
+
+/**
+ * @summary Serve an object entity from PRIVATE_OBJECT_DIR
+ */
+export const getStorageObject = async (objectPath: string, options?: RequestInit): Promise<Blob> => {
+
+  return customFetch<Blob>(getGetStorageObjectUrl(objectPath),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetStorageObjectQueryKey = (objectPath: string,) => {
+    return [
+    `/api/storage/objects/${objectPath}`
+    ] as const;
+    }
+
+
+export const getGetStorageObjectQueryOptions = <TData = Awaited<ReturnType<typeof getStorageObject>>, TError = ErrorType<ErrorEnvelope>>(objectPath: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getStorageObject>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetStorageObjectQueryKey(objectPath);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getStorageObject>>> = ({ signal }) => getStorageObject(objectPath, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(objectPath), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getStorageObject>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetStorageObjectQueryResult = NonNullable<Awaited<ReturnType<typeof getStorageObject>>>
+export type GetStorageObjectQueryError = ErrorType<ErrorEnvelope>
+
+
+/**
+ * @summary Serve an object entity from PRIVATE_OBJECT_DIR
+ */
+
+export function useGetStorageObject<TData = Awaited<ReturnType<typeof getStorageObject>>, TError = ErrorType<ErrorEnvelope>>(
+ objectPath: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getStorageObject>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetStorageObjectQueryOptions(objectPath,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

@@ -6,13 +6,30 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './consentDocument';
+export * from './consentDocumentRequest';
 export * from './creator';
+export * from './creatorEarnings';
+export * from './creatorRanking';
+export * from './earningsByVideo';
+export * from './errorEnvelope';
 export * from './feedItem';
 export * from './feedResponse';
+export * from './getCreatorRankingsParams';
 export * from './getFeedParams';
+export * from './getVideoStatsParams';
 export * from './healthStatus';
 export * from './interactionResponse';
+export * from './okResponse';
 export * from './participant';
+export * from './payout';
+export * from './payoutCreated';
+export * from './payoutRequest';
 export * from './purchase';
 export * from './purchaseRequest';
 export * from './purchaseResponse';
+export * from './uploadUrlRequest';
+export * from './uploadUrlResponse';
+export * from './videoEventRequest';
+export * from './videoEventRequestType';
+export * from './videoStats';

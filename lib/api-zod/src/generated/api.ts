@@ -235,3 +235,198 @@ export const ListMyPurchasesResponseItem = zod.object({
 export const ListMyPurchasesResponse = zod.array(ListMyPurchasesResponseItem)
 
 
+/**
+ * @summary Log a teaser click or view event
+ */
+export const TrackVideoEventParams = zod.object({
+  "videoId": zod.coerce.string()
+})
+
+export const TrackVideoEventBody = zod.object({
+  "type": zod.enum(['teaser_click', 'view'])
+})
+
+export const TrackVideoEventResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+/**
+ * @summary Funnel and revenue stats for one video
+ */
+export const GetVideoStatsQueryParams = zod.object({
+  "videoId": zod.coerce.string(),
+  "from": zod.date().optional(),
+  "to": zod.date().optional()
+})
+
+export const GetVideoStatsResponse = zod.object({
+  "videoId": zod.string(),
+  "clicks": zod.number(),
+  "views": zod.number(),
+  "purchases": zod.number(),
+  "grossRevenueCents": zod.number(),
+  "conversionRate": zod.number().describe('purchases \/ clicks (0-1)')
+})
+
+
+/**
+ * @summary Lifetime and available balance with per-video breakdown
+ */
+export const GetCreatorEarningsParams = zod.object({
+  "handle": zod.coerce.string()
+})
+
+export const GetCreatorEarningsResponse = zod.object({
+  "creatorId": zod.string(),
+  "handle": zod.string(),
+  "totalEarnedCents": zod.number(),
+  "paidOutCents": zod.number(),
+  "availableCents": zod.number(),
+  "byVideo": zod.array(zod.object({
+  "videoId": zod.string(),
+  "title": zod.string(),
+  "postType": zod.string(),
+  "amountCents": zod.number(),
+  "purchases": zod.number()
+}))
+})
+
+
+/**
+ * @summary Payout history for a creator
+ */
+export const ListCreatorPayoutsParams = zod.object({
+  "handle": zod.coerce.string()
+})
+
+export const ListCreatorPayoutsResponseItem = zod.object({
+  "id": zod.string(),
+  "creatorId": zod.string(),
+  "amountCents": zod.number(),
+  "status": zod.string(),
+  "provider": zod.string().nullish(),
+  "providerRef": zod.string().nullish(),
+  "periodStart": zod.coerce.date().nullish(),
+  "periodEnd": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date()
+})
+export const ListCreatorPayoutsResponse = zod.array(ListCreatorPayoutsResponseItem)
+
+
+/**
+ * @summary Request a payout of the available balance
+ */
+export const RequestCreatorPayoutParams = zod.object({
+  "handle": zod.coerce.string()
+})
+
+export const RequestCreatorPayoutBody = zod.object({
+  "amountCents": zod.number().optional().describe('Optional. Defaults to the full available balance.')
+})
+
+
+/**
+ * @summary Leaderboard of creators by earnings
+ */
+export const GetCreatorRankingsQueryParams = zod.object({
+  "from": zod.date().optional(),
+  "to": zod.date().optional()
+})
+
+export const GetCreatorRankingsResponseItem = zod.object({
+  "rank": zod.number(),
+  "creatorId": zod.string(),
+  "handle": zod.string(),
+  "displayName": zod.string(),
+  "avatarUrl": zod.string(),
+  "revenueCents": zod.number(),
+  "purchases": zod.number()
+})
+export const GetCreatorRankingsResponse = zod.array(GetCreatorRankingsResponseItem)
+
+
+/**
+ * @summary List consent documents for a video
+ */
+export const ListConsentDocumentsParams = zod.object({
+  "videoId": zod.coerce.string()
+})
+
+export const ListConsentDocumentsResponseItem = zod.object({
+  "id": zod.string(),
+  "videoId": zod.string(),
+  "creatorId": zod.string().nullish(),
+  "fileUrl": zod.string(),
+  "fileName": zod.string(),
+  "contentType": zod.string(),
+  "uploadedBy": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})
+export const ListConsentDocumentsResponse = zod.array(ListConsentDocumentsResponseItem)
+
+
+/**
+ * @summary Record a consent document after upload
+ */
+export const CreateConsentDocumentParams = zod.object({
+  "videoId": zod.coerce.string()
+})
+
+export const CreateConsentDocumentBody = zod.object({
+  "fileUrl": zod.string(),
+  "fileName": zod.string(),
+  "contentType": zod.string(),
+  "creatorId": zod.string().nullish()
+})
+
+
+/**
+ * Returns a presigned GCS URL for direct upload. The client sends JSON
+metadata here, then uploads the file directly to the returned URL.
+
+ * @summary Request a presigned URL for file upload
+ */
+
+
+
+
+
+export const RequestUploadUrlBody = zod.object({
+  "name": zod.string().min(1).describe('Original file name.'),
+  "size": zod.number().min(1).describe('File size in bytes.'),
+  "contentType": zod.string().min(1).describe('MIME type of the file (e.g. `image\/jpeg`).')
+})
+
+
+
+
+
+
+export const RequestUploadUrlResponse = zod.object({
+  "uploadURL": zod.string().url().describe('Presigned GCS URL for PUT upload.'),
+  "objectPath": zod.string().describe('Normalized object path (e.g. `\/objects\/uploads\/uuid`).'),
+  "metadata": zod.object({
+  "name": zod.string().min(1).describe('Original file name.'),
+  "size": zod.number().min(1).describe('File size in bytes.'),
+  "contentType": zod.string().min(1).describe('MIME type of the file (e.g. `image\/jpeg`).')
+}).optional()
+})
+
+
+/**
+ * @summary Serve a public asset from PUBLIC_OBJECT_SEARCH_PATHS
+ */
+export const GetPublicObjectParams = zod.object({
+  "filePath": zod.coerce.string().describe('Relative file path within the public search paths.')
+})
+
+
+/**
+ * @summary Serve an object entity from PRIVATE_OBJECT_DIR
+ */
+export const GetStorageObjectParams = zod.object({
+  "objectPath": zod.coerce.string().describe('Object path within the private object dir.')
+})
+
+

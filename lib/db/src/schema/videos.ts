@@ -27,6 +27,9 @@ export const videosTable = pgTable("videos", {
   savesCount: integer("saves_count").notNull().default(0),
   tags: jsonb("tags").$type<string[]>().notNull().default([]),
   status: text("status").notNull().default("published"),
+  // "creator" = posted by a creator/star (platform takes 20%).
+  // "studio"  = exclusive posted by BackpackBoys (platform takes 33%).
+  postType: text("post_type").notNull().default("creator"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

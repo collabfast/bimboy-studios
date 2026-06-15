@@ -3,3 +3,7 @@ export * from "./videos";
 export * from "./purchases";
 export * from "./interactions";
 export * from "./participants";
+export * from "./earnings";
+export * from "./payouts";
+export * from "./events";
+export * from "./consent";

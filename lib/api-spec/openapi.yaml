@@ -13,6 +13,11 @@ tags:
   - name: creators
   - name: purchases
   - name: interactions
+  - name: analytics
+  - name: earnings
+  - name: consent
+  - name: Storage
+    description: Object storage upload and serving endpoints.
 paths:
   /healthz:
     get:
@@ -170,6 +175,275 @@ paths:
               schema:
                 type: array
                 items: { $ref: "#/components/schemas/Purchase" }
+  /videos/{videoId}/events:
+    post:
+      operationId: trackVideoEvent
+      tags: [analytics]
+      summary: Log a teaser click or view event
+      parameters:
+        - in: path
+          name: videoId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/VideoEventRequest" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OkResponse" }
+        "404": { description: Not found }
+  /videos/stats:
+    get:
+      operationId: getVideoStats
+      tags: [analytics]
+      summary: Funnel and revenue stats for one video
+      parameters:
+        - in: query
+          name: videoId
+          required: true
+          schema: { type: string }
+        - in: query
+          name: from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/VideoStats" }
+  /creators/{handle}/earnings:
+    get:
+      operationId: getCreatorEarnings
+      tags: [earnings]
+      summary: Lifetime and available balance with per-video breakdown
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: handle
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CreatorEarnings" }
+        "404": { description: Not found }
+  /creators/{handle}/payouts:
+    get:
+      operationId: listCreatorPayouts
+      tags: [earnings]
+      summary: Payout history for a creator
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: handle
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Payout" }
+        "404": { description: Not found }
+    post:
+      operationId: requestCreatorPayout
+      tags: [earnings]
+      summary: Request a payout of the available balance
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: handle
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PayoutRequest" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PayoutCreated" }
+        "400": { description: Invalid request }
+        "404": { description: Not found }
+  /rankings/creators:
+    get:
+      operationId: getCreatorRankings
+      tags: [earnings]
+      summary: Leaderboard of creators by earnings
+      parameters:
+        - in: query
+          name: from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/CreatorRanking" }
+  /videos/{videoId}/consent-documents:
+    get:
+      operationId: listConsentDocuments
+      tags: [consent]
+      summary: List consent documents for a video
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: videoId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/ConsentDocument" }
+    post:
+      operationId: createConsentDocument
+      tags: [consent]
+      summary: Record a consent document after upload
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: videoId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ConsentDocumentRequest" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ConsentDocument" }
+        "400": { description: Invalid request }
+        "404": { description: Not found }
+  /storage/uploads/request-url:
+    post:
+      tags: [Storage]
+      operationId: requestUploadUrl
+      summary: Request a presigned URL for file upload
+      description: |
+        Returns a presigned GCS URL for direct upload. The client sends JSON
+        metadata here, then uploads the file directly to the returned URL.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UploadUrlRequest"
+      responses:
+        "200":
+          description: Presigned upload URL generated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadUrlResponse"
+        "400":
+          description: Missing or invalid required fields.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "500":
+          description: Failed to generate upload URL.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+  /storage/public-objects/{filePath}:
+    get:
+      tags: [Storage]
+      operationId: getPublicObject
+      summary: Serve a public asset from PUBLIC_OBJECT_SEARCH_PATHS
+      parameters:
+        - name: filePath
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Relative file path within the public search paths.
+      responses:
+        "200":
+          description: Object content streamed with correct Content-Type.
+          content:
+            "*/*":
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: File not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "500":
+          description: Failed to serve public object.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+  /storage/objects/{objectPath}:
+    get:
+      tags: [Storage]
+      operationId: getStorageObject
+      summary: Serve an object entity from PRIVATE_OBJECT_DIR
+      parameters:
+        - name: objectPath
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Object path within the private object dir.
+      responses:
+        "200":
+          description: Object content streamed with correct Content-Type.
+          content:
+            "*/*":
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: Object not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "500":
+          description: Failed to serve object.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
 components:
   securitySchemes:
     bearerAuth:
@@ -273,3 +547,140 @@ components:
       properties:
         purchase: { $ref: "#/components/schemas/Purchase" }
         redirectUrl: { type: string }
+    OkResponse:
+      type: object
+      required: [ok]
+      properties:
+        ok: { type: boolean }
+    VideoEventRequest:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+          enum: [teaser_click, view]
+    VideoStats:
+      type: object
+      required: [videoId, clicks, views, purchases, grossRevenueCents, conversionRate]
+      properties:
+        videoId: { type: string }
+        clicks: { type: integer }
+        views: { type: integer }
+        purchases: { type: integer }
+        grossRevenueCents: { type: integer }
+        conversionRate: { type: number, description: "purchases / clicks (0-1)" }
+    EarningsByVideo:
+      type: object
+      required: [videoId, title, postType, amountCents, purchases]
+      properties:
+        videoId: { type: string }
+        title: { type: string }
+        postType: { type: string }
+        amountCents: { type: integer }
+        purchases: { type: integer }
+    CreatorEarnings:
+      type: object
+      required: [creatorId, handle, totalEarnedCents, paidOutCents, availableCents, byVideo]
+      properties:
+        creatorId: { type: string }
+        handle: { type: string }
+        totalEarnedCents: { type: integer }
+        paidOutCents: { type: integer }
+        availableCents: { type: integer }
+        byVideo:
+          type: array
+          items: { $ref: "#/components/schemas/EarningsByVideo" }
+    Payout:
+      type: object
+      required: [id, creatorId, amountCents, status, createdAt]
+      properties:
+        id: { type: string }
+        creatorId: { type: string }
+        amountCents: { type: integer }
+        status: { type: string }
+        provider: { type: string, nullable: true }
+        providerRef: { type: string, nullable: true }
+        periodStart: { type: string, format: date-time, nullable: true }
+        periodEnd: { type: string, format: date-time, nullable: true }
+        createdAt: { type: string, format: date-time }
+    PayoutRequest:
+      type: object
+      properties:
+        amountCents:
+          type: integer
+          description: "Optional. Defaults to the full available balance."
+    PayoutCreated:
+      type: object
+      required: [id, creatorId, amountCents, status, statusLabel, createdAt]
+      properties:
+        id: { type: string }
+        creatorId: { type: string }
+        amountCents: { type: integer }
+        status: { type: string }
+        statusLabel: { type: string }
+        createdAt: { type: string, format: date-time }
+    CreatorRanking:
+      type: object
+      required: [rank, creatorId, handle, displayName, avatarUrl, revenueCents, purchases]
+      properties:
+        rank: { type: integer }
+        creatorId: { type: string }
+        handle: { type: string }
+        displayName: { type: string }
+        avatarUrl: { type: string }
+        revenueCents: { type: integer }
+        purchases: { type: integer }
+    ConsentDocumentRequest:
+      type: object
+      required: [fileUrl, fileName, contentType]
+      properties:
+        fileUrl: { type: string }
+        fileName: { type: string }
+        contentType: { type: string }
+        creatorId: { type: string, nullable: true }
+    ConsentDocument:
+      type: object
+      required: [id, videoId, fileUrl, fileName, contentType, createdAt]
+      properties:
+        id: { type: string }
+        videoId: { type: string }
+        creatorId: { type: string, nullable: true }
+        fileUrl: { type: string }
+        fileName: { type: string }
+        contentType: { type: string }
+        uploadedBy: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+    UploadUrlRequest:
+      type: object
+      required: [name, size, contentType]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          description: Original file name.
+        size:
+          type: integer
+          minimum: 1
+          description: File size in bytes.
+        contentType:
+          type: string
+          minLength: 1
+          description: MIME type of the file (e.g. `image/jpeg`).
+    UploadUrlResponse:
+      type: object
+      required: [uploadURL, objectPath]
+      properties:
+        uploadURL:
+          type: string
+          format: uri
+          description: Presigned GCS URL for PUT upload.
+        objectPath:
+          type: string
+          description: Normalized object path (e.g. `/objects/uploads/uuid`).
+        metadata:
+          $ref: "#/components/schemas/UploadUrlRequest"
+    ErrorEnvelope:
+      type: object
+      required: [error]
+      properties:
+        error: { type: string }

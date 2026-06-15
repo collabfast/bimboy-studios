@@ -72,11 +72,149 @@ export interface PurchaseResponse {
   redirectUrl: string;
 }
 
+export interface OkResponse {
+  ok: boolean;
+}
+
+export type VideoEventRequestType = typeof VideoEventRequestType[keyof typeof VideoEventRequestType];
+
+
+export const VideoEventRequestType = {
+  teaser_click: 'teaser_click',
+  view: 'view',
+} as const;
+
+export interface VideoEventRequest {
+  type: VideoEventRequestType;
+}
+
+export interface VideoStats {
+  videoId: string;
+  clicks: number;
+  views: number;
+  purchases: number;
+  grossRevenueCents: number;
+  /** purchases / clicks (0-1) */
+  conversionRate: number;
+}
+
+export interface EarningsByVideo {
+  videoId: string;
+  title: string;
+  postType: string;
+  amountCents: number;
+  purchases: number;
+}
+
+export interface CreatorEarnings {
+  creatorId: string;
+  handle: string;
+  totalEarnedCents: number;
+  paidOutCents: number;
+  availableCents: number;
+  byVideo: EarningsByVideo[];
+}
+
+export interface Payout {
+  id: string;
+  creatorId: string;
+  amountCents: number;
+  status: string;
+  provider?: string | null;
+  providerRef?: string | null;
+  periodStart?: string | null;
+  periodEnd?: string | null;
+  createdAt: string;
+}
+
+export interface PayoutRequest {
+  /** Optional. Defaults to the full available balance. */
+  amountCents?: number;
+}
+
+export interface PayoutCreated {
+  id: string;
+  creatorId: string;
+  amountCents: number;
+  status: string;
+  statusLabel: string;
+  createdAt: string;
+}
+
+export interface CreatorRanking {
+  rank: number;
+  creatorId: string;
+  handle: string;
+  displayName: string;
+  avatarUrl: string;
+  revenueCents: number;
+  purchases: number;
+}
+
+export interface ConsentDocumentRequest {
+  fileUrl: string;
+  fileName: string;
+  contentType: string;
+  creatorId?: string | null;
+}
+
+export interface ConsentDocument {
+  id: string;
+  videoId: string;
+  creatorId?: string | null;
+  fileUrl: string;
+  fileName: string;
+  contentType: string;
+  uploadedBy?: string | null;
+  createdAt: string;
+}
+
+export interface UploadUrlRequest {
+  /**
+     * Original file name.
+     * @minLength 1
+     */
+  name: string;
+  /**
+     * File size in bytes.
+     * @minimum 1
+     */
+  size: number;
+  /**
+     * MIME type of the file (e.g. `image/jpeg`).
+     * @minLength 1
+     */
+  contentType: string;
+}
+
+export interface UploadUrlResponse {
+  /** Presigned GCS URL for PUT upload. */
+  uploadURL: string;
+  /** Normalized object path (e.g. `/objects/uploads/uuid`). */
+  objectPath: string;
+  metadata?: UploadUrlRequest;
+}
+
+export interface ErrorEnvelope {
+  error: string;
+}
+
 export type GetFeedParams = {
 /**
  * @minimum 1
  * @maximum 50
  */
 limit?: number;
+};
+
+export type GetVideoStatsParams = {
+videoId: string;
+from?: string;
+to?: string;
+};
+
+export type GetCreatorRankingsParams = {
+from?: string;
+to?: string;
 };
 
