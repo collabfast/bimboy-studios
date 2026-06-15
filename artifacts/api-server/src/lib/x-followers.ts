@@ -12,6 +12,19 @@ export function hasXToken(): boolean {
   return !!process.env.X_BEARER_TOKEN;
 }
 
+// Cached follower counts are considered stale after this TTL. Viewing a profile
+// past this point triggers an automatic background re-fetch so numbers stay
+// current without anyone clicking "Fetch".
+export const FOLLOWERS_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
+
+export function isFollowersStale(
+  followersUpdatedAt: Date | null,
+  now: Date = new Date(),
+): boolean {
+  if (!followersUpdatedAt) return true;
+  return now.getTime() - followersUpdatedAt.getTime() > FOLLOWERS_TTL_MS;
+}
+
 /**
  * Fetch a public follower count for an X handle via the X API v2.
  * `handle` may include a leading "@".

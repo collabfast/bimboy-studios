@@ -5,11 +5,39 @@ import {
   videosTable,
   videoParticipantsTable,
   type PlatformLink,
+  type Creator,
 } from "@workspace/db";
 import { eq, desc, or, and, isNull, inArray } from "drizzle-orm";
 import { buildFeedItems, toCreatorDto } from "../lib/feed-items";
 import { requireAuth } from "../middleware/auth";
-import { fetchXFollowers } from "../lib/x-followers";
+import { fetchXFollowers, hasXToken, isFollowersStale } from "../lib/x-followers";
+
+// Auto-refresh the cached follower count when it has gone stale (or when
+// `force` is set). Re-fetches from the X API and persists the new count.
+// Degrades gracefully: with no X handle, no API token, or a failed request the
+// existing creator record is returned unchanged so the cached/manual value
+// survives. This is a system-driven update — it never claims ownership, so it
+// is safe to run for unauthenticated profile views.
+async function refreshFollowersIfStale(
+  creator: Creator,
+  opts: { force?: boolean } = {},
+): Promise<Creator> {
+  if (!creator.xHandle) return creator;
+  if (!opts.force && !isFollowersStale(creator.followersUpdatedAt)) {
+    return creator;
+  }
+  if (!hasXToken()) return creator;
+
+  const result = await fetchXFollowers(creator.xHandle);
+  if (!result.ok) return creator;
+
+  const [updated] = await db
+    .update(creatorsTable)
+    .set({ followerCount: result.followers, followersUpdatedAt: new Date() })
+    .where(eq(creatorsTable.id, creator.id))
+    .returning();
+  return updated ?? creator;
+}
 
 const router: IRouter = Router();
 
@@ -80,7 +108,8 @@ router.get("/creators/:handle", async (req, res) => {
     res.status(404).json({ error: "Not found" });
     return;
   }
-  res.json(toCreatorDto(row));
+  const creator = await refreshFollowersIfStale(row);
+  res.json(toCreatorDto(creator));
 });
 
 router.get("/creators/:handle/videos", async (req, res) => {
