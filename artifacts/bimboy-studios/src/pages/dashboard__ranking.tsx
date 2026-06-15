@@ -1,17 +1,24 @@
-import { useMemo, useState } from "react";
 import { useGetCreatorRankings } from "@workspace/api-client-react";
 import { PeriodSelector } from "@/components/dashboard/period-selector";
+import { useDashboardPeriod } from "@/components/dashboard/use-period";
 import {
   EmptyBlock,
   ErrorBlock,
   LoadingBlock,
 } from "@/components/dashboard/state-block";
-import { buildPeriods, formatCents, type PeriodKey } from "@/lib/dashboard";
+import { formatCents } from "@/lib/dashboard";
 
 export default function DashboardRankingPage() {
-  const [periodKey, setPeriodKey] = useState<PeriodKey>("all");
-  const periods = useMemo(() => buildPeriods(), []);
-  const period = periods.find((p) => p.key === periodKey) ?? periods[0];
+  const {
+    periods,
+    period,
+    periodKey,
+    setPeriodKey,
+    customFrom,
+    setCustomFrom,
+    customTo,
+    setCustomTo,
+  } = useDashboardPeriod();
 
   const { data, isLoading, isError } = useGetCreatorRankings({
     from: period.from,
@@ -39,6 +46,10 @@ export default function DashboardRankingPage() {
             periods={periods}
             value={periodKey}
             onChange={setPeriodKey}
+            customFrom={customFrom}
+            customTo={customTo}
+            onCustomFromChange={setCustomFrom}
+            onCustomToChange={setCustomTo}
           />
         </div>
       </section>

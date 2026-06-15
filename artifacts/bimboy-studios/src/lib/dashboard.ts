@@ -71,7 +71,7 @@ export function isStudioPost(item: FeedItem): boolean {
   return item.postType === "studio";
 }
 
-export type PeriodKey = "all" | "today" | "7d" | "30d" | "month";
+export type PeriodKey = "all" | "day" | "week" | "month" | "custom";
 
 export type Period = {
   key: PeriodKey;
@@ -96,9 +96,34 @@ export function buildPeriods(now: Date = new Date()): Period[] {
 
   return [
     { key: "all", label: "All time" },
-    { key: "today", label: "Today", from: startOf(now), to },
-    { key: "7d", label: "Last 7 days", from: daysAgo(7), to },
-    { key: "30d", label: "Last 30 days", from: daysAgo(30), to },
+    { key: "day", label: "Today", from: startOf(now), to },
+    { key: "week", label: "Last 7 days", from: daysAgo(7), to },
     { key: "month", label: "This month", from: monthStart, to },
+    { key: "custom", label: "Custom" },
   ];
+}
+
+/**
+ * Build a Period from two `yyyy-mm-dd` date-input values. `from` is anchored to
+ * the start of the day and `to` to the end of the day so the range is inclusive.
+ */
+export function resolveCustomPeriod(fromDate: string, toDate: string): Period {
+  const from = fromDate
+    ? new Date(`${fromDate}T00:00:00`).toISOString()
+    : undefined;
+  const to = toDate
+    ? new Date(`${toDate}T23:59:59.999`).toISOString()
+    : undefined;
+  return { key: "custom", label: "Custom", from, to };
+}
+
+/** Resolve the active Period given the selected key + custom date inputs. */
+export function selectPeriod(
+  periods: Period[],
+  key: PeriodKey,
+  customFrom: string,
+  customTo: string,
+): Period {
+  if (key === "custom") return resolveCustomPeriod(customFrom, customTo);
+  return periods.find((p) => p.key === key) ?? periods[0];
 }

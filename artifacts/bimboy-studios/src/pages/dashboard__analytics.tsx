@@ -1,16 +1,16 @@
-import { useMemo, useState } from "react";
 import { useQueries } from "@tanstack/react-query";
 import {
   getGetVideoStatsQueryOptions,
   useGetFeed,
 } from "@workspace/api-client-react";
 import { PeriodSelector } from "@/components/dashboard/period-selector";
+import { useDashboardPeriod } from "@/components/dashboard/use-period";
 import {
   EmptyBlock,
   ErrorBlock,
   LoadingBlock,
 } from "@/components/dashboard/state-block";
-import { buildPeriods, formatCents, formatPct, type PeriodKey } from "@/lib/dashboard";
+import { formatCents, formatPct } from "@/lib/dashboard";
 
 function SummaryCard({ label, value }: { label: string; value: string }) {
   return (
@@ -22,9 +22,16 @@ function SummaryCard({ label, value }: { label: string; value: string }) {
 }
 
 export default function DashboardAnalyticsPage() {
-  const [periodKey, setPeriodKey] = useState<PeriodKey>("all");
-  const periods = useMemo(() => buildPeriods(), []);
-  const period = periods.find((p) => p.key === periodKey) ?? periods[0];
+  const {
+    periods,
+    period,
+    periodKey,
+    setPeriodKey,
+    customFrom,
+    setCustomFrom,
+    customTo,
+    setCustomTo,
+  } = useDashboardPeriod();
 
   const { data: feed, isLoading: feedLoading, isError: feedError } = useGetFeed({
     limit: 50,
@@ -83,6 +90,10 @@ export default function DashboardAnalyticsPage() {
             periods={periods}
             value={periodKey}
             onChange={setPeriodKey}
+            customFrom={customFrom}
+            customTo={customTo}
+            onCustomFromChange={setCustomFrom}
+            onCustomToChange={setCustomTo}
           />
         </div>
       </section>

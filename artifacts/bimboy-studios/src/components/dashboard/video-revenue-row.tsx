@@ -1,12 +1,13 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import type { FeedItem } from "@workspace/api-client-react";
 import {
   getGetVideoStatsQueryKey,
   useGetVideoStats,
 } from "@workspace/api-client-react";
-import { buildPeriods, formatCents, formatPct, type PeriodKey } from "@/lib/dashboard";
+import { formatCents, formatPct } from "@/lib/dashboard";
 import { SplitBreakdown } from "./split-breakdown";
 import { PeriodSelector } from "./period-selector";
+import { useDashboardPeriod } from "./use-period";
 
 function StatTile({ label, value }: { label: string; value: string }) {
   return (
@@ -21,9 +22,16 @@ function StatTile({ label, value }: { label: string; value: string }) {
 
 export function VideoRevenueRow({ item }: { item: FeedItem }) {
   const [open, setOpen] = useState(false);
-  const [periodKey, setPeriodKey] = useState<PeriodKey>("all");
-  const periods = useMemo(() => buildPeriods(), []);
-  const period = periods.find((p) => p.key === periodKey) ?? periods[0];
+  const {
+    periods,
+    period,
+    periodKey,
+    setPeriodKey,
+    customFrom,
+    setCustomFrom,
+    customTo,
+    setCustomTo,
+  } = useDashboardPeriod();
 
   const statsParams = { videoId: item.id, from: period.from, to: period.to };
   const { data, isLoading, isError } = useGetVideoStats(statsParams, {
@@ -87,6 +95,10 @@ export function VideoRevenueRow({ item }: { item: FeedItem }) {
               periods={periods}
               value={periodKey}
               onChange={setPeriodKey}
+              customFrom={customFrom}
+              customTo={customTo}
+              onCustomFromChange={setCustomFrom}
+              onCustomToChange={setCustomTo}
             />
           </div>
 
