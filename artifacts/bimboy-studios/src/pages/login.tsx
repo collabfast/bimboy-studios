@@ -6,6 +6,15 @@ import { useAuth } from "@/lib/auth";
 
 type Mode = "signin" | "signup" | "magic";
 
+// Where Supabase should send users after they click the email confirmation /
+// magic link. Must include the app's base path (the app is served under a
+// sub-path, e.g. /bimboy-studios/), otherwise the link lands outside the app
+// and shows a blank "can't open page". This URL must also be added to the
+// Supabase project's Auth → URL Configuration redirect allowlist.
+function authRedirectUrl(): string {
+  return `${window.location.origin}${import.meta.env.BASE_URL}`;
+}
+
 export default function LoginPage() {
   const [, navigate] = useLocation();
   const { user, loading: authLoading } = useAuth();
@@ -33,13 +42,17 @@ export default function LoginPage() {
         if (error) throw error;
         navigate("/", { replace: true });
       } else if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({ email, password });
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { emailRedirectTo: authRedirectUrl() },
+        });
         if (error) throw error;
         setNotice("Check your email to confirm your account, then sign in.");
       } else {
         const { error } = await supabase.auth.signInWithOtp({
           email,
-          options: { emailRedirectTo: window.location.origin },
+          options: { emailRedirectTo: authRedirectUrl() },
         });
         if (error) throw error;
         setNotice("Magic link sent. Check your inbox.");
