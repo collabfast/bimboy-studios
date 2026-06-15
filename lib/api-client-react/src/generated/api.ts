@@ -24,6 +24,7 @@ import type {
   ConsentDocumentRequest,
   Creator,
   CreatorEarnings,
+  CreatorProfileUpdate,
   CreatorRanking,
   ErrorEnvelope,
   FeedResponse,
@@ -436,6 +437,148 @@ export function useGetCreatorVideos<TData = Awaited<ReturnType<typeof getCreator
 
 
 
+
+export const getUpdateCreatorProfileUrl = (handle: string,) => {
+
+
+
+
+  return `/api/creators/${handle}/profile`
+}
+
+/**
+ * @summary Update creator profile fields (links, X handle, testing status)
+ */
+export const updateCreatorProfile = async (handle: string,
+    creatorProfileUpdate: CreatorProfileUpdate, options?: RequestInit): Promise<Creator> => {
+
+  return customFetch<Creator>(getUpdateCreatorProfileUrl(handle),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      creatorProfileUpdate,)
+  }
+);}
+
+
+
+
+export const getUpdateCreatorProfileMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCreatorProfile>>, TError,{handle: string;data: BodyType<CreatorProfileUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateCreatorProfile>>, TError,{handle: string;data: BodyType<CreatorProfileUpdate>}, TContext> => {
+
+const mutationKey = ['updateCreatorProfile'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateCreatorProfile>>, {handle: string;data: BodyType<CreatorProfileUpdate>}> = (props) => {
+          const {handle,data} = props ?? {};
+
+          return  updateCreatorProfile(handle,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateCreatorProfileMutationResult = NonNullable<Awaited<ReturnType<typeof updateCreatorProfile>>>
+    export type UpdateCreatorProfileMutationBody = BodyType<CreatorProfileUpdate>
+    export type UpdateCreatorProfileMutationError = ErrorType<void>
+
+    /**
+ * @summary Update creator profile fields (links, X handle, testing status)
+ */
+export const useUpdateCreatorProfile = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCreatorProfile>>, TError,{handle: string;data: BodyType<CreatorProfileUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateCreatorProfile>>,
+        TError,
+        {handle: string;data: BodyType<CreatorProfileUpdate>},
+        TContext
+      > => {
+      return useMutation(getUpdateCreatorProfileMutationOptions(options));
+    }
+
+export const getRefreshCreatorFollowersUrl = (handle: string,) => {
+
+
+
+
+  return `/api/creators/${handle}/refresh-followers`
+}
+
+/**
+ * @summary Fetch and cache the creator's X/Twitter follower count
+ */
+export const refreshCreatorFollowers = async (handle: string, options?: RequestInit): Promise<Creator> => {
+
+  return customFetch<Creator>(getRefreshCreatorFollowersUrl(handle),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getRefreshCreatorFollowersMutationOptions = <TError = ErrorType<void | ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof refreshCreatorFollowers>>, TError,{handle: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof refreshCreatorFollowers>>, TError,{handle: string}, TContext> => {
+
+const mutationKey = ['refreshCreatorFollowers'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof refreshCreatorFollowers>>, {handle: string}> = (props) => {
+          const {handle} = props ?? {};
+
+          return  refreshCreatorFollowers(handle,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RefreshCreatorFollowersMutationResult = NonNullable<Awaited<ReturnType<typeof refreshCreatorFollowers>>>
+
+    export type RefreshCreatorFollowersMutationError = ErrorType<void | ErrorEnvelope>
+
+    /**
+ * @summary Fetch and cache the creator's X/Twitter follower count
+ */
+export const useRefreshCreatorFollowers = <TError = ErrorType<void | ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof refreshCreatorFollowers>>, TError,{handle: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof refreshCreatorFollowers>>,
+        TError,
+        {handle: string},
+        TContext
+      > => {
+      return useMutation(getRefreshCreatorFollowersMutationOptions(options));
+    }
 
 export const getGetLibraryUrl = () => {
 

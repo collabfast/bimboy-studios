@@ -927,9 +927,47 @@ button.swipe-brand:hover { opacity: .85; }
 .creator-hero-stats strong { color: #fff; font-size: 18px; }
 .creator-section-title { color: #fff; font-size: 20px; font-weight: 600; margin: 0 0 16px; padding-left: 4px; }
 .creator-card-split { font-size: 11px; color: rgba(255,180,210,.85); margin-top: 4px; }
+
+.creator-profile-grid {
+  display: grid; gap: 16px; margin-bottom: 32px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.creator-profile-card {
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(8,8,12,.55);
+  border-radius: 24px; padding: 22px 22px 24px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.creator-profile-card-label {
+  font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
+  color: rgba(255,255,255,.42); margin: 0;
+}
+.creator-profile-empty { color: rgba(255,255,255,.5); font-size: 14px; margin: 0; }
+.creator-link-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.creator-link {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  border: 1px solid rgba(255,255,255,.1); border-radius: 14px;
+  padding: 10px 14px; color: #fff; font-size: 14px; font-weight: 500;
+  text-decoration: none; transition: border-color .15s ease, background .15s ease;
+}
+.creator-link:hover { border-color: rgba(255,92,168,.5); background: rgba(255,92,168,.08); }
+.creator-collabfast-btn {
+  display: inline-flex; align-items: center; gap: 8px; align-self: flex-start;
+  margin-top: 4px; border-radius: 999px; padding: 10px 18px;
+  background: linear-gradient(90deg, #ec4899, #8b5cf6); color: #fff;
+  font-size: 14px; font-weight: 600; text-decoration: none;
+  box-shadow: 0 8px 24px rgba(236,72,153,.25); transition: filter .15s ease;
+}
+.creator-collabfast-btn:hover { filter: brightness(1.1); }
+.creator-stat-row { display: flex; align-items: flex-start; gap: 12px; }
+.creator-stat-value { color: #fff; font-size: 16px; font-weight: 600; }
+.creator-stat-sub { color: rgba(255,255,255,.55); font-size: 13px; font-weight: 400; }
+.creator-stat-caption { color: rgba(255,255,255,.5); font-size: 12px; margin-top: 2px; }
+
 @media (max-width: 600px) {
   .creator-hero { flex-direction: column; text-align: center; padding: 24px 18px; }
   .creator-hero-stats { justify-content: center; }
+  .creator-profile-grid { grid-template-columns: 1fr; }
 }
 
 /* === Studio page === */

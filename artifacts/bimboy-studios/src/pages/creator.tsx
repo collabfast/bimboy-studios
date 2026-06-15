@@ -1,5 +1,14 @@
 import { useParams, Link } from "wouter";
-import { BadgeCheck, Lock, Play } from "lucide-react";
+import {
+  BadgeCheck,
+  ExternalLink,
+  Handshake,
+  Lock,
+  Play,
+  ShieldCheck,
+  ShieldAlert,
+  Users,
+} from "lucide-react";
 import {
   useGetCreator,
   useGetCreatorVideos,
@@ -7,6 +16,7 @@ import {
   type FeedItem,
 } from "@workspace/api-client-react";
 import { useAuth } from "@/lib/auth";
+import { useViewerMode } from "@/lib/viewer-mode";
 
 function formatDuration(s: number) {
   const m = Math.floor(s / 60);
@@ -14,10 +24,25 @@ function formatDuration(s: number) {
   return `${m}:${r.toString().padStart(2, "0")}`;
 }
 
+function formatFollowers(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+  return n.toLocaleString();
+}
+
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
 export default function CreatorPage() {
   const params = useParams<{ handle: string }>();
   const handle = params.handle ?? "";
   const { user } = useAuth();
+  const { isCreator: viewerIsCreator } = useViewerMode();
 
   const { data: creator, isLoading, isError } = useGetCreator(handle);
   const { data: feed } = useGetCreatorVideos(handle);
@@ -79,6 +104,83 @@ export default function CreatorPage() {
               </strong>{" "}
               likes
             </span>
+          </div>
+        </div>
+      </section>
+
+      <section className="creator-profile-grid">
+        <div className="creator-profile-card">
+          <p className="creator-profile-card-label">Find me everywhere</p>
+          {creator.platformLinks.length === 0 ? (
+            <p className="creator-profile-empty">No external links added yet.</p>
+          ) : (
+            <ul className="creator-link-list">
+              {creator.platformLinks.map((link) => (
+                <li key={`${link.label}-${link.url}`}>
+                  <a
+                    href={link.url}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="creator-link"
+                  >
+                    <span>{link.label}</span>
+                    <ExternalLink className="h-4 w-4 opacity-70" />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+          {viewerIsCreator && user && creator.collabFastUrl ? (
+            <a
+              href={creator.collabFastUrl}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="creator-collabfast-btn"
+            >
+              <Handshake className="h-4 w-4" />
+              Collab via CollabFast
+            </a>
+          ) : null}
+        </div>
+
+        <div className="creator-profile-card">
+          <p className="creator-profile-card-label">Reach & safety</p>
+          <div className="creator-stat-row">
+            <Users className="h-5 w-5 text-pink-300" />
+            <div>
+              <div className="creator-stat-value">
+                {creator.followerCount != null
+                  ? formatFollowers(creator.followerCount)
+                  : "—"}
+                {creator.xHandle ? (
+                  <span className="creator-stat-sub"> on X (@{creator.xHandle})</span>
+                ) : null}
+              </div>
+              <div className="creator-stat-caption">
+                {creator.followersUpdatedAt
+                  ? `Followers · updated ${formatDate(creator.followersUpdatedAt)}`
+                  : "Follower count not set"}
+              </div>
+            </div>
+          </div>
+          <div className="creator-stat-row">
+            {creator.testingVerified ? (
+              <ShieldCheck className="h-5 w-5 text-emerald-400" />
+            ) : (
+              <ShieldAlert className="h-5 w-5 text-amber-400" />
+            )}
+            <div>
+              <div className="creator-stat-value">
+                {creator.testingVerified
+                  ? "Health & STI testing verified"
+                  : "Testing status unverified"}
+              </div>
+              <div className="creator-stat-caption">
+                {creator.lastTestedAt
+                  ? `Last tested ${formatDate(creator.lastTestedAt)}`
+                  : "No test date on file"}
+              </div>
+            </div>
           </div>
         </div>
       </section>

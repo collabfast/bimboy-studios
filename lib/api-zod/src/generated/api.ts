@@ -49,7 +49,17 @@ export const GetFeedResponse = zod.object({
   "displayName": zod.string(),
   "avatarUrl": zod.string(),
   "bio": zod.string().nullish(),
-  "verified": zod.boolean()
+  "verified": zod.boolean(),
+  "platformLinks": zod.array(zod.object({
+  "label": zod.string(),
+  "url": zod.string()
+})),
+  "xHandle": zod.string().nullish(),
+  "followerCount": zod.number().nullish(),
+  "followersUpdatedAt": zod.coerce.date().nullish(),
+  "lastTestedAt": zod.coerce.date().nullish(),
+  "testingVerified": zod.boolean(),
+  "collabFastUrl": zod.string().nullish()
 }),
   "participants": zod.array(zod.object({
   "creator": zod.object({
@@ -58,7 +68,17 @@ export const GetFeedResponse = zod.object({
   "displayName": zod.string(),
   "avatarUrl": zod.string(),
   "bio": zod.string().nullish(),
-  "verified": zod.boolean()
+  "verified": zod.boolean(),
+  "platformLinks": zod.array(zod.object({
+  "label": zod.string(),
+  "url": zod.string()
+})),
+  "xHandle": zod.string().nullish(),
+  "followerCount": zod.number().nullish(),
+  "followersUpdatedAt": zod.coerce.date().nullish(),
+  "lastTestedAt": zod.coerce.date().nullish(),
+  "testingVerified": zod.boolean(),
+  "collabFastUrl": zod.string().nullish()
 }),
   "splitBps": zod.number().describe('Revenue share in basis points (0-10000)')
 })),
@@ -78,7 +98,17 @@ export const ListCreatorsResponseItem = zod.object({
   "displayName": zod.string(),
   "avatarUrl": zod.string(),
   "bio": zod.string().nullish(),
-  "verified": zod.boolean()
+  "verified": zod.boolean(),
+  "platformLinks": zod.array(zod.object({
+  "label": zod.string(),
+  "url": zod.string()
+})),
+  "xHandle": zod.string().nullish(),
+  "followerCount": zod.number().nullish(),
+  "followersUpdatedAt": zod.coerce.date().nullish(),
+  "lastTestedAt": zod.coerce.date().nullish(),
+  "testingVerified": zod.boolean(),
+  "collabFastUrl": zod.string().nullish()
 })
 export const ListCreatorsResponse = zod.array(ListCreatorsResponseItem)
 
@@ -93,7 +123,17 @@ export const GetCreatorResponse = zod.object({
   "displayName": zod.string(),
   "avatarUrl": zod.string(),
   "bio": zod.string().nullish(),
-  "verified": zod.boolean()
+  "verified": zod.boolean(),
+  "platformLinks": zod.array(zod.object({
+  "label": zod.string(),
+  "url": zod.string()
+})),
+  "xHandle": zod.string().nullish(),
+  "followerCount": zod.number().nullish(),
+  "followersUpdatedAt": zod.coerce.date().nullish(),
+  "lastTestedAt": zod.coerce.date().nullish(),
+  "testingVerified": zod.boolean(),
+  "collabFastUrl": zod.string().nullish()
 })
 
 
@@ -122,7 +162,17 @@ export const GetCreatorVideosResponse = zod.object({
   "displayName": zod.string(),
   "avatarUrl": zod.string(),
   "bio": zod.string().nullish(),
-  "verified": zod.boolean()
+  "verified": zod.boolean(),
+  "platformLinks": zod.array(zod.object({
+  "label": zod.string(),
+  "url": zod.string()
+})),
+  "xHandle": zod.string().nullish(),
+  "followerCount": zod.number().nullish(),
+  "followersUpdatedAt": zod.coerce.date().nullish(),
+  "lastTestedAt": zod.coerce.date().nullish(),
+  "testingVerified": zod.boolean(),
+  "collabFastUrl": zod.string().nullish()
 }),
   "participants": zod.array(zod.object({
   "creator": zod.object({
@@ -131,7 +181,17 @@ export const GetCreatorVideosResponse = zod.object({
   "displayName": zod.string(),
   "avatarUrl": zod.string(),
   "bio": zod.string().nullish(),
-  "verified": zod.boolean()
+  "verified": zod.boolean(),
+  "platformLinks": zod.array(zod.object({
+  "label": zod.string(),
+  "url": zod.string()
+})),
+  "xHandle": zod.string().nullish(),
+  "followerCount": zod.number().nullish(),
+  "followersUpdatedAt": zod.coerce.date().nullish(),
+  "lastTestedAt": zod.coerce.date().nullish(),
+  "testingVerified": zod.boolean(),
+  "collabFastUrl": zod.string().nullish()
 }),
   "splitBps": zod.number().describe('Revenue share in basis points (0-10000)')
 })),
@@ -139,6 +199,73 @@ export const GetCreatorVideosResponse = zod.object({
   "liked": zod.boolean(),
   "saved": zod.boolean()
 }))
+})
+
+
+/**
+ * @summary Update creator profile fields (links, X handle, testing status)
+ */
+export const UpdateCreatorProfileParams = zod.object({
+  "handle": zod.coerce.string()
+})
+
+export const UpdateCreatorProfileBody = zod.object({
+  "bio": zod.string().nullish(),
+  "platformLinks": zod.array(zod.object({
+  "label": zod.string(),
+  "url": zod.string()
+})).optional(),
+  "xHandle": zod.string().nullish(),
+  "followerCount": zod.number().nullish(),
+  "lastTestedAt": zod.coerce.date().nullish(),
+  "testingVerified": zod.boolean().optional(),
+  "collabFastUrl": zod.string().nullish()
+})
+
+export const UpdateCreatorProfileResponse = zod.object({
+  "id": zod.string(),
+  "handle": zod.string(),
+  "displayName": zod.string(),
+  "avatarUrl": zod.string(),
+  "bio": zod.string().nullish(),
+  "verified": zod.boolean(),
+  "platformLinks": zod.array(zod.object({
+  "label": zod.string(),
+  "url": zod.string()
+})),
+  "xHandle": zod.string().nullish(),
+  "followerCount": zod.number().nullish(),
+  "followersUpdatedAt": zod.coerce.date().nullish(),
+  "lastTestedAt": zod.coerce.date().nullish(),
+  "testingVerified": zod.boolean(),
+  "collabFastUrl": zod.string().nullish()
+})
+
+
+/**
+ * @summary Fetch and cache the creator's X/Twitter follower count
+ */
+export const RefreshCreatorFollowersParams = zod.object({
+  "handle": zod.coerce.string()
+})
+
+export const RefreshCreatorFollowersResponse = zod.object({
+  "id": zod.string(),
+  "handle": zod.string(),
+  "displayName": zod.string(),
+  "avatarUrl": zod.string(),
+  "bio": zod.string().nullish(),
+  "verified": zod.boolean(),
+  "platformLinks": zod.array(zod.object({
+  "label": zod.string(),
+  "url": zod.string()
+})),
+  "xHandle": zod.string().nullish(),
+  "followerCount": zod.number().nullish(),
+  "followersUpdatedAt": zod.coerce.date().nullish(),
+  "lastTestedAt": zod.coerce.date().nullish(),
+  "testingVerified": zod.boolean(),
+  "collabFastUrl": zod.string().nullish()
 })
 
 
@@ -166,7 +293,17 @@ export const GetLibraryResponse = zod.object({
   "displayName": zod.string(),
   "avatarUrl": zod.string(),
   "bio": zod.string().nullish(),
-  "verified": zod.boolean()
+  "verified": zod.boolean(),
+  "platformLinks": zod.array(zod.object({
+  "label": zod.string(),
+  "url": zod.string()
+})),
+  "xHandle": zod.string().nullish(),
+  "followerCount": zod.number().nullish(),
+  "followersUpdatedAt": zod.coerce.date().nullish(),
+  "lastTestedAt": zod.coerce.date().nullish(),
+  "testingVerified": zod.boolean(),
+  "collabFastUrl": zod.string().nullish()
 }),
   "participants": zod.array(zod.object({
   "creator": zod.object({
@@ -175,7 +312,17 @@ export const GetLibraryResponse = zod.object({
   "displayName": zod.string(),
   "avatarUrl": zod.string(),
   "bio": zod.string().nullish(),
-  "verified": zod.boolean()
+  "verified": zod.boolean(),
+  "platformLinks": zod.array(zod.object({
+  "label": zod.string(),
+  "url": zod.string()
+})),
+  "xHandle": zod.string().nullish(),
+  "followerCount": zod.number().nullish(),
+  "followersUpdatedAt": zod.coerce.date().nullish(),
+  "lastTestedAt": zod.coerce.date().nullish(),
+  "testingVerified": zod.boolean(),
+  "collabFastUrl": zod.string().nullish()
 }),
   "splitBps": zod.number().describe('Revenue share in basis points (0-10000)')
 })),

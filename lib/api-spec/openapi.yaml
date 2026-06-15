@@ -96,6 +96,56 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/FeedResponse" }
         "404": { description: Not found }
+  /creators/{handle}/profile:
+    patch:
+      operationId: updateCreatorProfile
+      tags: [creators]
+      summary: Update creator profile fields (links, X handle, testing status)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: handle
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreatorProfileUpdate" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Creator" }
+        "400": { description: Invalid request }
+        "404": { description: Not found }
+  /creators/{handle}/refresh-followers:
+    post:
+      operationId: refreshCreatorFollowers
+      tags: [creators]
+      summary: Fetch and cache the creator's X/Twitter follower count
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: handle
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Creator" }
+        "400": { description: No X handle set }
+        "404": { description: Not found }
+        "502":
+          description: X API unavailable
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorEnvelope" }
   /library:
     get:
       operationId: getLibrary
@@ -458,7 +508,7 @@ components:
         status: { type: string }
     Creator:
       type: object
-      required: [id, handle, displayName, avatarUrl, verified]
+      required: [id, handle, displayName, avatarUrl, verified, platformLinks, testingVerified]
       properties:
         id: { type: string }
         handle: { type: string }
@@ -466,6 +516,33 @@ components:
         avatarUrl: { type: string }
         bio: { type: string, nullable: true }
         verified: { type: boolean }
+        platformLinks:
+          type: array
+          items: { $ref: "#/components/schemas/PlatformLink" }
+        xHandle: { type: string, nullable: true }
+        followerCount: { type: integer, nullable: true }
+        followersUpdatedAt: { type: string, format: date-time, nullable: true }
+        lastTestedAt: { type: string, format: date-time, nullable: true }
+        testingVerified: { type: boolean }
+        collabFastUrl: { type: string, nullable: true }
+    PlatformLink:
+      type: object
+      required: [label, url]
+      properties:
+        label: { type: string }
+        url: { type: string }
+    CreatorProfileUpdate:
+      type: object
+      properties:
+        bio: { type: string, nullable: true }
+        platformLinks:
+          type: array
+          items: { $ref: "#/components/schemas/PlatformLink" }
+        xHandle: { type: string, nullable: true }
+        followerCount: { type: integer, nullable: true }
+        lastTestedAt: { type: string, format: date-time, nullable: true }
+        testingVerified: { type: boolean }
+        collabFastUrl: { type: string, nullable: true }
     FeedItem:
       type: object
       required:

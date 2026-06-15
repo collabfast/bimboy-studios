@@ -7,18 +7,12 @@
  */
 import type { PlatformLink } from './platformLink';
 
-export interface Creator {
-  id: string;
-  handle: string;
-  displayName: string;
-  avatarUrl: string;
+export interface CreatorProfileUpdate {
   bio?: string | null;
-  verified: boolean;
-  platformLinks: PlatformLink[];
+  platformLinks?: PlatformLink[];
   xHandle?: string | null;
   followerCount?: number | null;
-  followersUpdatedAt?: Date | null;
   lastTestedAt?: Date | null;
-  testingVerified: boolean;
+  testingVerified?: boolean;
   collabFastUrl?: string | null;
 }

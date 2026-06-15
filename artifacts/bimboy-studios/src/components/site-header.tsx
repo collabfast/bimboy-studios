@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { useLocation } from "wouter";
 import { useEffect, useRef, useState } from "react";
 import { siteNavigation } from "@/lib/placeholders";
+import { useViewerMode } from "@/lib/viewer-mode";
 
 const joinOptions = [
   { href: "/join/creator", label: "Become a Creator" },
@@ -13,6 +14,7 @@ export function SiteHeader() {
   const [pathname] = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const { isCreator, toggle } = useViewerMode();
 
   useEffect(() => {
     function handlePointerDown(event: MouseEvent) {
@@ -68,6 +70,19 @@ export function SiteHeader() {
         </div>
 
         <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={toggle}
+            aria-pressed={isCreator}
+            title="Switch how the site treats you — creators see collab tools"
+            className={`hidden rounded-full border px-4 py-2 text-sm font-semibold transition sm:block ${
+              isCreator
+                ? "border-pink-400/40 bg-pink-500/10 text-pink-100"
+                : "border-white/10 text-white/70 hover:border-white/20"
+            }`}
+          >
+            {isCreator ? "Viewing as Creator" : "Viewing as Fan"}
+          </button>
           <Link
             href="/login"
             className="rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-white/85 transition hover:border-white/20"

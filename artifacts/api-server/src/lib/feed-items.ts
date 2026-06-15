@@ -11,6 +11,8 @@ import {
 } from "@workspace/db";
 import { eq, inArray } from "drizzle-orm";
 
+type PlatformLinkDto = { label: string; url: string };
+
 type CreatorDto = {
   id: string;
   handle: string;
@@ -18,9 +20,16 @@ type CreatorDto = {
   avatarUrl: string;
   bio: string | null;
   verified: boolean;
+  platformLinks: PlatformLinkDto[];
+  xHandle: string | null;
+  followerCount: number | null;
+  followersUpdatedAt: string | null;
+  lastTestedAt: string | null;
+  testingVerified: boolean;
+  collabFastUrl: string | null;
 };
 
-function toCreatorDto(c: Creator): CreatorDto {
+export function toCreatorDto(c: Creator): CreatorDto {
   return {
     id: c.id,
     handle: c.handle,
@@ -28,6 +37,15 @@ function toCreatorDto(c: Creator): CreatorDto {
     avatarUrl: c.avatarUrl,
     bio: c.bio,
     verified: c.verified,
+    platformLinks: c.platformLinks ?? [],
+    xHandle: c.xHandle ?? null,
+    followerCount: c.followerCount ?? null,
+    followersUpdatedAt: c.followersUpdatedAt
+      ? c.followersUpdatedAt.toISOString()
+      : null,
+    lastTestedAt: c.lastTestedAt ? c.lastTestedAt.toISOString() : null,
+    testingVerified: c.testingVerified,
+    collabFastUrl: c.collabFastUrl ?? null,
   };
 }
 

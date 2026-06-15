@@ -9,6 +9,11 @@ export interface HealthStatus {
   status: string;
 }
 
+export interface PlatformLink {
+  label: string;
+  url: string;
+}
+
 export interface Creator {
   id: string;
   handle: string;
@@ -16,6 +21,23 @@ export interface Creator {
   avatarUrl: string;
   bio?: string | null;
   verified: boolean;
+  platformLinks: PlatformLink[];
+  xHandle?: string | null;
+  followerCount?: number | null;
+  followersUpdatedAt?: string | null;
+  lastTestedAt?: string | null;
+  testingVerified: boolean;
+  collabFastUrl?: string | null;
+}
+
+export interface CreatorProfileUpdate {
+  bio?: string | null;
+  platformLinks?: PlatformLink[];
+  xHandle?: string | null;
+  followerCount?: number | null;
+  lastTestedAt?: string | null;
+  testingVerified?: boolean;
+  collabFastUrl?: string | null;
 }
 
 export interface Participant {

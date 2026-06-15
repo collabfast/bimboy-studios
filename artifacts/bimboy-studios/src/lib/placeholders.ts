@@ -144,6 +144,11 @@ export const dashboardNavigation: DashboardNavItem[] = [
     label: "Earnings",
     description: "Balance, earnings by post, and payout history.",
   },
+  {
+    href: "/dashboard/profile",
+    label: "Profile",
+    description: "Platform links, follower reach, and testing status.",
+  },
 ];
 
 export const studioDashboardNavigation: DashboardNavItem[] = [
