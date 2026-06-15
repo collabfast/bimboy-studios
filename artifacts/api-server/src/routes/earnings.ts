@@ -30,13 +30,26 @@ async function resolveCreator(handleOrId: string) {
   return byId;
 }
 
+// Earnings and payouts are financial data: only the user who owns the creator
+// (ownerUserId === sub) may read or act on them. Unlike profile edits there is
+// no claim-on-first-edit here — money endpoints never establish ownership.
+function ownsCreator(
+  creator: { ownerUserId: string | null },
+  userId: string,
+): boolean {
+  return creator.ownerUserId === userId;
+}
+
 // GET /creators/:handle/earnings — lifetime + available balance with a
-// per-video breakdown. Ownership is not yet enforced (no user↔creator link);
-// any authenticated user can read. Tracked as a follow-up.
+// per-video breakdown. Only the creator's owner may read it.
 router.get("/creators/:handle/earnings", requireAuth, async (req, res) => {
   const creator = await resolveCreator(req.params.handle as string);
   if (!creator) {
     res.status(404).json({ error: "Creator not found" });
+    return;
+  }
+  if (!ownsCreator(creator, req.userId!)) {
+    res.status(403).json({ error: "You do not own this creator profile" });
     return;
   }
 
@@ -88,6 +101,10 @@ router.get("/creators/:handle/payouts", requireAuth, async (req, res) => {
     res.status(404).json({ error: "Creator not found" });
     return;
   }
+  if (!ownsCreator(creator, req.userId!)) {
+    res.status(403).json({ error: "You do not own this creator profile" });
+    return;
+  }
   const rows = await db
     .select()
     .from(payoutsTable)
@@ -114,6 +131,10 @@ router.post("/creators/:handle/payouts", requireAuth, async (req, res) => {
   const creator = await resolveCreator(req.params.handle as string);
   if (!creator) {
     res.status(404).json({ error: "Creator not found" });
+    return;
+  }
+  if (!ownsCreator(creator, req.userId!)) {
+    res.status(403).json({ error: "You do not own this creator profile" });
     return;
   }
 

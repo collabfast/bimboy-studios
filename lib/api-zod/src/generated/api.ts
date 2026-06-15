@@ -110,6 +110,29 @@ export const ListCreatorsResponseItem = zod.object({
 export const ListCreatorsResponse = zod.array(ListCreatorsResponseItem)
 
 
+/**
+ * @summary Creators owned by the signed-in user
+ */
+export const ListMyCreatorsResponseItem = zod.object({
+  "id": zod.string(),
+  "handle": zod.string(),
+  "displayName": zod.string(),
+  "avatarUrl": zod.string(),
+  "bio": zod.string().nullish(),
+  "verified": zod.boolean(),
+  "platformLinks": zod.array(zod.object({
+  "label": zod.string(),
+  "url": zod.string()
+})),
+  "xHandle": zod.string().nullish(),
+  "followerCount": zod.number().nullish(),
+  "followersUpdatedAt": zod.coerce.date().nullish(),
+  "lastTestedAt": zod.coerce.date().nullish(),
+  "testingVerified": zod.boolean()
+})
+export const ListMyCreatorsResponse = zod.array(ListMyCreatorsResponseItem)
+
+
 export const GetCreatorParams = zod.object({
   "handle": zod.coerce.string()
 })

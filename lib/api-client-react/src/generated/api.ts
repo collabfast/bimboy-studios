@@ -297,6 +297,83 @@ export function useListCreators<TData = Awaited<ReturnType<typeof listCreators>>
 
 
 
+export const getListMyCreatorsUrl = () => {
+
+
+
+
+  return `/api/me/creators`
+}
+
+/**
+ * @summary Creators owned by the signed-in user
+ */
+export const listMyCreators = async ( options?: RequestInit): Promise<Creator[]> => {
+
+  return customFetch<Creator[]>(getListMyCreatorsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListMyCreatorsQueryKey = () => {
+    return [
+    `/api/me/creators`
+    ] as const;
+    }
+
+
+export const getListMyCreatorsQueryOptions = <TData = Awaited<ReturnType<typeof listMyCreators>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listMyCreators>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListMyCreatorsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listMyCreators>>> = ({ signal }) => listMyCreators({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listMyCreators>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListMyCreatorsQueryResult = NonNullable<Awaited<ReturnType<typeof listMyCreators>>>
+export type ListMyCreatorsQueryError = ErrorType<void>
+
+
+/**
+ * @summary Creators owned by the signed-in user
+ */
+
+export function useListMyCreators<TData = Awaited<ReturnType<typeof listMyCreators>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listMyCreators>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListMyCreatorsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
 export const getGetCreatorUrl = (handle: string,) => {
 
 

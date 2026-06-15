@@ -57,6 +57,17 @@ router.get("/creators", async (_req, res) => {
   res.json(rows.map(toCreatorDto));
 });
 
+// Creators owned by the signed-in user. Drives the dashboard so a creator
+// manages their own page(s) instead of picking from a global operator list.
+router.get("/me/creators", requireAuth, async (req, res) => {
+  const rows = await db
+    .select()
+    .from(creatorsTable)
+    .where(eq(creatorsTable.ownerUserId, req.userId!))
+    .orderBy(desc(creatorsTable.createdAt));
+  res.json(rows.map(toCreatorDto));
+});
+
 router.get("/creators/:handle", async (req, res) => {
   // @ts-ignore
   const handle = req.params.handle as string;

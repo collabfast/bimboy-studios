@@ -5,10 +5,10 @@ import {
   getListCreatorPayoutsQueryKey,
   useGetCreatorEarnings,
   useListCreatorPayouts,
-  useListCreators,
   useRequestCreatorPayout,
 } from "@workspace/api-client-react";
 import { formatCents } from "@/lib/dashboard";
+import { useDashboardCreators } from "@/hooks/use-dashboard-creators";
 import {
   AuthRequiredBlock,
   EmptyBlock,
@@ -49,11 +49,15 @@ function SummaryCard({
 
 export default function DashboardEarningsPage() {
   const queryClient = useQueryClient();
-  const { data: creators, isLoading: creatorsLoading } = useListCreators();
+  const {
+    creators,
+    isLoading: creatorsLoading,
+    isClaimMode,
+  } = useDashboardCreators();
   const [handle, setHandle] = useState<string>("");
 
   useEffect(() => {
-    if (!handle && creators && creators.length > 0) {
+    if (!handle && creators.length > 0) {
       setHandle(creators[0].handle);
     }
   }, [creators, handle]);
@@ -109,25 +113,32 @@ export default function DashboardEarningsPage() {
               payout requests.
             </p>
           </div>
-          <label className="flex flex-col gap-1.5 text-xs uppercase tracking-[0.18em] text-white/45">
-            Creator
-            <select
-              value={handle}
-              onChange={(e) => setHandle(e.target.value)}
-              disabled={creatorsLoading}
-              className="rounded-2xl border border-white/10 bg-black/40 px-4 py-2.5 text-sm font-medium normal-case tracking-normal text-white outline-none transition focus:border-pink-400/40"
-            >
-              {(creators ?? []).map((c) => (
-                <option key={c.id} value={c.handle}>
-                  {c.displayName} (@{c.handle})
-                </option>
-              ))}
-            </select>
-          </label>
+          {isClaimMode ? null : (
+            <label className="flex flex-col gap-1.5 text-xs uppercase tracking-[0.18em] text-white/45">
+              Your profile
+              <select
+                value={handle}
+                onChange={(e) => setHandle(e.target.value)}
+                disabled={creatorsLoading}
+                className="rounded-2xl border border-white/10 bg-black/40 px-4 py-2.5 text-sm font-medium normal-case tracking-normal text-white outline-none transition focus:border-pink-400/40"
+              >
+                {creators.map((c) => (
+                  <option key={c.id} value={c.handle}>
+                    {c.displayName} (@{c.handle})
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
         </div>
       </section>
 
-      {earningsLoading || !handle ? (
+      {isClaimMode ? (
+        <EmptyBlock
+          title="No creator profile linked yet"
+          description="Claim your profile on the Profile page first — earnings and payouts are only available for creators you own."
+        />
+      ) : earningsLoading || !handle ? (
         <LoadingBlock label="Loading earnings…" />
       ) : earningsError ? (
         isUnauthorized(earningsErr) ? (

@@ -6,11 +6,11 @@ import {
   getGetCreatorCollabQueryKey,
   useGetCreator,
   useGetCreatorCollab,
-  useListCreators,
   useRefreshCreatorFollowers,
   useUpdateCreatorProfile,
   type PlatformLink,
 } from "@workspace/api-client-react";
+import { useDashboardCreators } from "@/hooks/use-dashboard-creators";
 
 function toDateInput(iso: string | null | undefined): string {
   if (!iso) return "";
@@ -21,11 +21,15 @@ function toDateInput(iso: string | null | undefined): string {
 
 export default function DashboardProfilePage() {
   const queryClient = useQueryClient();
-  const { data: creators, isLoading: creatorsLoading } = useListCreators();
+  const {
+    creators,
+    isLoading: creatorsLoading,
+    isClaimMode,
+  } = useDashboardCreators();
   const [handle, setHandle] = useState<string>("");
 
   useEffect(() => {
-    if (!handle && creators && creators.length > 0) {
+    if (!handle && creators.length > 0) {
       setHandle(creators[0].handle);
     }
   }, [creators, handle]);
@@ -126,19 +130,25 @@ export default function DashboardProfilePage() {
             </p>
           </div>
           <label className="flex flex-col gap-1.5 text-xs uppercase tracking-[0.18em] text-white/45">
-            Creator
+            {isClaimMode ? "Claim a profile" : "Your profile"}
             <select
               value={handle}
               onChange={(e) => setHandle(e.target.value)}
               disabled={creatorsLoading}
               className="rounded-2xl border border-white/10 bg-black/40 px-4 py-2.5 text-sm font-medium normal-case tracking-normal text-white outline-none transition focus:border-pink-400/40"
             >
-              {(creators ?? []).map((c) => (
+              {creators.map((c) => (
                 <option key={c.id} value={c.handle}>
                   {c.displayName} (@{c.handle})
                 </option>
               ))}
             </select>
+            {isClaimMode ? (
+              <span className="max-w-[260px] text-[11px] normal-case tracking-normal text-white/45">
+                Saving links this profile to your account — afterwards only you
+                can edit it.
+              </span>
+            ) : null}
           </label>
         </div>
       </section>

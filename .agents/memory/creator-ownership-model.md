@@ -7,13 +7,27 @@ description: How bimboy-studios authorizes creator-profile mutations and CollabF
 
 `creators.ownerUserId` (nullable text) authorizes all creator-profile mutations.
 
-## Claim-on-first-edit (must stay atomic)
+## Claim-on-first-edit (must stay atomic) — PROFILE mutations only
 An unowned creator (ownerUserId NULL) is claimed by the first authenticated user
-to mutate it; thereafter only the owner may mutate. This applies to **every**
-mutation endpoint (PATCH profile, POST refresh-followers), not just PATCH.
+to mutate it; thereafter only the owner may mutate. This applies to the
+**profile** mutation endpoints (PATCH profile, POST refresh-followers).
 
-**Why:** there is no user↔creator account link yet (that is a separate follow-up).
-Claim-on-first-edit is the interim ownership mechanism.
+**Why:** claim-on-first-edit is the realistic account→creator linking mechanism
+(there is no admin-assigns-creator flow). It is the onboarding path by which a
+user becomes the owner.
+
+## Money endpoints (earnings/payouts) — strict ownership, NO claim
+GET earnings, GET payouts, POST payouts authorize on `ownerUserId === sub` and
+return 403 otherwise. They must NOT claim an unowned creator — money movement
+must never establish ownership. A user claims via profile first, then money
+endpoints recognize them.
+
+## Dashboard sources its creator selector from owned creators
+`GET /me/creators` (authed) returns creators owned by the caller. The dashboard
+(profile + earnings pages) drives its selector from this, not the global
+`/creators` operator list. Fallback: when the user owns none, profile page shows
+the full list so they can claim-on-first-edit; earnings page shows a "claim
+first" empty state (no point listing creators whose earnings would 403).
 
 **How to apply:** the claim must be race-safe. Do the authorization in the SQL
 UPDATE WHERE clause, not only on a prior read:
