@@ -12,11 +12,12 @@ import {
 import {
   useGetCreator,
   useGetCreatorVideos,
+  useGetCreatorCollab,
   useGetLibrary,
+  getGetCreatorCollabQueryKey,
   type FeedItem,
 } from "@workspace/api-client-react";
 import { useAuth } from "@/lib/auth";
-import { useViewerMode } from "@/lib/viewer-mode";
 
 function formatDuration(s: number) {
   const m = Math.floor(s / 60);
@@ -42,10 +43,16 @@ export default function CreatorPage() {
   const params = useParams<{ handle: string }>();
   const handle = params.handle ?? "";
   const { user } = useAuth();
-  const { isCreator: viewerIsCreator } = useViewerMode();
 
   const { data: creator, isLoading, isError } = useGetCreator(handle);
   const { data: feed } = useGetCreatorVideos(handle);
+  const { data: collab } = useGetCreatorCollab(handle, {
+    query: {
+      enabled: !!user && !!handle,
+      queryKey: getGetCreatorCollabQueryKey(handle),
+      retry: false,
+    },
+  });
   const { data: library } = useGetLibrary({
     query: { enabled: !!user, queryKey: ["getLibrary"] },
   });
@@ -130,9 +137,9 @@ export default function CreatorPage() {
               ))}
             </ul>
           )}
-          {viewerIsCreator && user && creator.collabFastUrl ? (
+          {collab?.collabFastUrl ? (
             <a
-              href={creator.collabFastUrl}
+              href={collab.collabFastUrl}
               target="_blank"
               rel="noreferrer noopener"
               className="creator-collabfast-btn"

@@ -20,6 +20,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  CollabLink,
   ConsentDocument,
   ConsentDocumentRequest,
   Creator,
@@ -509,6 +510,83 @@ export const useUpdateCreatorProfile = <TError = ErrorType<void>,
       > => {
       return useMutation(getUpdateCreatorProfileMutationOptions(options));
     }
+
+export const getGetCreatorCollabUrl = (handle: string,) => {
+
+
+
+
+  return `/api/creators/${handle}/collab`
+}
+
+/**
+ * @summary Get a creator's CollabFast link (creators/pornstars only)
+ */
+export const getCreatorCollab = async (handle: string, options?: RequestInit): Promise<CollabLink> => {
+
+  return customFetch<CollabLink>(getGetCreatorCollabUrl(handle),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCreatorCollabQueryKey = (handle: string,) => {
+    return [
+    `/api/creators/${handle}/collab`
+    ] as const;
+    }
+
+
+export const getGetCreatorCollabQueryOptions = <TData = Awaited<ReturnType<typeof getCreatorCollab>>, TError = ErrorType<void>>(handle: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCreatorCollab>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCreatorCollabQueryKey(handle);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCreatorCollab>>> = ({ signal }) => getCreatorCollab(handle, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(handle), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCreatorCollab>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetCreatorCollabQueryResult = NonNullable<Awaited<ReturnType<typeof getCreatorCollab>>>
+export type GetCreatorCollabQueryError = ErrorType<void>
+
+
+/**
+ * @summary Get a creator's CollabFast link (creators/pornstars only)
+ */
+
+export function useGetCreatorCollab<TData = Awaited<ReturnType<typeof getCreatorCollab>>, TError = ErrorType<void>>(
+ handle: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCreatorCollab>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetCreatorCollabQueryOptions(handle,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
 export const getRefreshCreatorFollowersUrl = (handle: string,) => {
 

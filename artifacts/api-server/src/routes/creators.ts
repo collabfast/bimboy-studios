@@ -6,12 +6,51 @@ import {
   videoParticipantsTable,
   type PlatformLink,
 } from "@workspace/db";
-import { eq, desc, or, inArray } from "drizzle-orm";
+import { eq, desc, or, and, isNull, inArray } from "drizzle-orm";
 import { buildFeedItems, toCreatorDto } from "../lib/feed-items";
 import { requireAuth } from "../middleware/auth";
 import { fetchXFollowers } from "../lib/x-followers";
 
 const router: IRouter = Router();
+
+// A "creator/pornstar" viewer is an authenticated user who owns at least one
+// creator record. Profiles are claimed on first edit (see enforceOwnership),
+// so a real creator who has set up their page is recognized as a creator viewer.
+async function userOwnsAnyCreator(userId: string): Promise<boolean> {
+  const [row] = await db
+    .select({ id: creatorsTable.id })
+    .from(creatorsTable)
+    .where(eq(creatorsTable.ownerUserId, userId))
+    .limit(1);
+  return !!row;
+}
+
+// Authorization for mutating a creator. A creator with no owner is claimed by
+// the first authenticated user to edit it (returns claim=true so the caller
+// persists ownerUserId). Once owned, only the owner may mutate it.
+type OwnershipCheck =
+  | { allowed: true; claim: boolean }
+  | { allowed: false };
+
+function checkOwnership(
+  creator: { ownerUserId: string | null },
+  userId: string,
+): OwnershipCheck {
+  if (creator.ownerUserId == null) return { allowed: true, claim: true };
+  if (creator.ownerUserId === userId) return { allowed: true, claim: false };
+  return { allowed: false };
+}
+
+// SQL guard for atomic claim-on-first-edit: only an unowned profile or one
+// already owned by this user can be mutated. Combined with claiming the row in
+// the same UPDATE, this makes first-claim race-safe — a concurrent second
+// claimant matches 0 rows once the first write commits.
+function ownershipGuard(userId: string) {
+  return or(
+    isNull(creatorsTable.ownerUserId),
+    eq(creatorsTable.ownerUserId, userId),
+  );
+}
 
 router.get("/creators", async (_req, res) => {
   const rows = await db.select().from(creatorsTable).limit(50);
@@ -110,8 +149,15 @@ router.patch("/creators/:handle/profile", requireAuth, async (req, res) => {
     return;
   }
 
+  const ownership = checkOwnership(creator, req.userId!);
+  if (!ownership.allowed) {
+    res.status(403).json({ error: "You do not own this creator profile" });
+    return;
+  }
+
   const body = (req.body ?? {}) as Record<string, unknown>;
   const updates: Partial<typeof creatorsTable.$inferInsert> = {};
+  if (ownership.claim) updates.ownerUserId = req.userId!;
 
   if ("bio" in body) {
     updates.bio = body.bio === null ? null : String(body.bio);
@@ -179,8 +225,12 @@ router.patch("/creators/:handle/profile", requireAuth, async (req, res) => {
   const [updated] = await db
     .update(creatorsTable)
     .set(updates)
-    .where(eq(creatorsTable.id, creator.id))
+    .where(and(eq(creatorsTable.id, creator.id), ownershipGuard(req.userId!)))
     .returning();
+  if (!updated) {
+    res.status(403).json({ error: "You do not own this creator profile" });
+    return;
+  }
   res.json(toCreatorDto(updated));
 });
 
@@ -196,6 +246,11 @@ router.post(
       .limit(1);
     if (!creator) {
       res.status(404).json({ error: "Not found" });
+      return;
+    }
+    const ownership = checkOwnership(creator, req.userId!);
+    if (!ownership.allowed) {
+      res.status(403).json({ error: "You do not own this creator profile" });
       return;
     }
     if (!creator.xHandle) {
@@ -215,13 +270,43 @@ router.post(
       return;
     }
 
+    const setData: Partial<typeof creatorsTable.$inferInsert> = {
+      followerCount: result.followers,
+      followersUpdatedAt: new Date(),
+    };
+    if (ownership.claim) setData.ownerUserId = req.userId!;
     const [updated] = await db
       .update(creatorsTable)
-      .set({ followerCount: result.followers, followersUpdatedAt: new Date() })
-      .where(eq(creatorsTable.id, creator.id))
+      .set(setData)
+      .where(and(eq(creatorsTable.id, creator.id), ownershipGuard(req.userId!)))
       .returning();
+    if (!updated) {
+      res.status(403).json({ error: "You do not own this creator profile" });
+      return;
+    }
     res.json(toCreatorDto(updated));
   },
 );
+
+// CollabFast link is private to creators/pornstars. Only an authenticated user
+// who owns at least one creator profile may read it; fans get 403.
+router.get("/creators/:handle/collab", requireAuth, async (req, res) => {
+  const handle = req.params.handle as string;
+  const [creator] = await db
+    .select()
+    .from(creatorsTable)
+    .where(eq(creatorsTable.handle, handle))
+    .limit(1);
+  if (!creator) {
+    res.status(404).json({ error: "Not found" });
+    return;
+  }
+  const isCreator = await userOwnsAnyCreator(req.userId!);
+  if (!isCreator) {
+    res.status(403).json({ error: "Only creators can view collab links" });
+    return;
+  }
+  res.json({ collabFastUrl: creator.collabFastUrl ?? null });
+});
 
 export default router;

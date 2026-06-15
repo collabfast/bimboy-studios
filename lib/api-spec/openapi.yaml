@@ -121,6 +121,26 @@ paths:
               schema: { $ref: "#/components/schemas/Creator" }
         "400": { description: Invalid request }
         "404": { description: Not found }
+  /creators/{handle}/collab:
+    get:
+      operationId: getCreatorCollab
+      tags: [creators]
+      summary: Get a creator's CollabFast link (creators/pornstars only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: handle
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CollabLink" }
+        "403": { description: Viewer is not a creator }
+        "404": { description: Not found }
   /creators/{handle}/refresh-followers:
     post:
       operationId: refreshCreatorFollowers
@@ -524,6 +544,10 @@ components:
         followersUpdatedAt: { type: string, format: date-time, nullable: true }
         lastTestedAt: { type: string, format: date-time, nullable: true }
         testingVerified: { type: boolean }
+    CollabLink:
+      type: object
+      required: [collabFastUrl]
+      properties:
         collabFastUrl: { type: string, nullable: true }
     PlatformLink:
       type: object

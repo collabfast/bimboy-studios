@@ -26,7 +26,6 @@ type CreatorDto = {
   followersUpdatedAt: string | null;
   lastTestedAt: string | null;
   testingVerified: boolean;
-  collabFastUrl: string | null;
 };
 
 export function toCreatorDto(c: Creator): CreatorDto {
@@ -45,7 +44,6 @@ export function toCreatorDto(c: Creator): CreatorDto {
       : null,
     lastTestedAt: c.lastTestedAt ? c.lastTestedAt.toISOString() : null,
     testingVerified: c.testingVerified,
-    collabFastUrl: c.collabFastUrl ?? null,
   };
 }
 

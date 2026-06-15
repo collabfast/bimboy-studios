@@ -58,8 +58,7 @@ export const GetFeedResponse = zod.object({
   "followerCount": zod.number().nullish(),
   "followersUpdatedAt": zod.coerce.date().nullish(),
   "lastTestedAt": zod.coerce.date().nullish(),
-  "testingVerified": zod.boolean(),
-  "collabFastUrl": zod.string().nullish()
+  "testingVerified": zod.boolean()
 }),
   "participants": zod.array(zod.object({
   "creator": zod.object({
@@ -77,8 +76,7 @@ export const GetFeedResponse = zod.object({
   "followerCount": zod.number().nullish(),
   "followersUpdatedAt": zod.coerce.date().nullish(),
   "lastTestedAt": zod.coerce.date().nullish(),
-  "testingVerified": zod.boolean(),
-  "collabFastUrl": zod.string().nullish()
+  "testingVerified": zod.boolean()
 }),
   "splitBps": zod.number().describe('Revenue share in basis points (0-10000)')
 })),
@@ -107,8 +105,7 @@ export const ListCreatorsResponseItem = zod.object({
   "followerCount": zod.number().nullish(),
   "followersUpdatedAt": zod.coerce.date().nullish(),
   "lastTestedAt": zod.coerce.date().nullish(),
-  "testingVerified": zod.boolean(),
-  "collabFastUrl": zod.string().nullish()
+  "testingVerified": zod.boolean()
 })
 export const ListCreatorsResponse = zod.array(ListCreatorsResponseItem)
 
@@ -132,8 +129,7 @@ export const GetCreatorResponse = zod.object({
   "followerCount": zod.number().nullish(),
   "followersUpdatedAt": zod.coerce.date().nullish(),
   "lastTestedAt": zod.coerce.date().nullish(),
-  "testingVerified": zod.boolean(),
-  "collabFastUrl": zod.string().nullish()
+  "testingVerified": zod.boolean()
 })
 
 
@@ -171,8 +167,7 @@ export const GetCreatorVideosResponse = zod.object({
   "followerCount": zod.number().nullish(),
   "followersUpdatedAt": zod.coerce.date().nullish(),
   "lastTestedAt": zod.coerce.date().nullish(),
-  "testingVerified": zod.boolean(),
-  "collabFastUrl": zod.string().nullish()
+  "testingVerified": zod.boolean()
 }),
   "participants": zod.array(zod.object({
   "creator": zod.object({
@@ -190,8 +185,7 @@ export const GetCreatorVideosResponse = zod.object({
   "followerCount": zod.number().nullish(),
   "followersUpdatedAt": zod.coerce.date().nullish(),
   "lastTestedAt": zod.coerce.date().nullish(),
-  "testingVerified": zod.boolean(),
-  "collabFastUrl": zod.string().nullish()
+  "testingVerified": zod.boolean()
 }),
   "splitBps": zod.number().describe('Revenue share in basis points (0-10000)')
 })),
@@ -237,8 +231,19 @@ export const UpdateCreatorProfileResponse = zod.object({
   "followerCount": zod.number().nullish(),
   "followersUpdatedAt": zod.coerce.date().nullish(),
   "lastTestedAt": zod.coerce.date().nullish(),
-  "testingVerified": zod.boolean(),
-  "collabFastUrl": zod.string().nullish()
+  "testingVerified": zod.boolean()
+})
+
+
+/**
+ * @summary Get a creator's CollabFast link (creators/pornstars only)
+ */
+export const GetCreatorCollabParams = zod.object({
+  "handle": zod.coerce.string()
+})
+
+export const GetCreatorCollabResponse = zod.object({
+  "collabFastUrl": zod.string().nullable()
 })
 
 
@@ -264,8 +269,7 @@ export const RefreshCreatorFollowersResponse = zod.object({
   "followerCount": zod.number().nullish(),
   "followersUpdatedAt": zod.coerce.date().nullish(),
   "lastTestedAt": zod.coerce.date().nullish(),
-  "testingVerified": zod.boolean(),
-  "collabFastUrl": zod.string().nullish()
+  "testingVerified": zod.boolean()
 })
 
 
@@ -302,8 +306,7 @@ export const GetLibraryResponse = zod.object({
   "followerCount": zod.number().nullish(),
   "followersUpdatedAt": zod.coerce.date().nullish(),
   "lastTestedAt": zod.coerce.date().nullish(),
-  "testingVerified": zod.boolean(),
-  "collabFastUrl": zod.string().nullish()
+  "testingVerified": zod.boolean()
 }),
   "participants": zod.array(zod.object({
   "creator": zod.object({
@@ -321,8 +324,7 @@ export const GetLibraryResponse = zod.object({
   "followerCount": zod.number().nullish(),
   "followersUpdatedAt": zod.coerce.date().nullish(),
   "lastTestedAt": zod.coerce.date().nullish(),
-  "testingVerified": zod.boolean(),
-  "collabFastUrl": zod.string().nullish()
+  "testingVerified": zod.boolean()
 }),
   "splitBps": zod.number().describe('Revenue share in basis points (0-10000)')
 })),

@@ -27,7 +27,10 @@ export interface Creator {
   followersUpdatedAt?: string | null;
   lastTestedAt?: string | null;
   testingVerified: boolean;
-  collabFastUrl?: string | null;
+}
+
+export interface CollabLink {
+  collabFastUrl: string | null;
 }
 
 export interface CreatorProfileUpdate {

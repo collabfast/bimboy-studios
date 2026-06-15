@@ -20,5 +20,4 @@ export interface Creator {
   followersUpdatedAt?: Date | null;
   lastTestedAt?: Date | null;
   testingVerified: boolean;
-  collabFastUrl?: string | null;
 }

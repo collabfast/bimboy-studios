@@ -3,7 +3,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Plus, RefreshCw, Trash2 } from "lucide-react";
 import {
   getGetCreatorQueryKey,
+  getGetCreatorCollabQueryKey,
   useGetCreator,
+  useGetCreatorCollab,
   useListCreators,
   useRefreshCreatorFollowers,
   useUpdateCreatorProfile,
@@ -31,6 +33,13 @@ export default function DashboardProfilePage() {
   const { data: creator } = useGetCreator(handle, {
     query: { enabled: !!handle, queryKey: getGetCreatorQueryKey(handle) },
   });
+  const { data: collab } = useGetCreatorCollab(handle, {
+    query: {
+      enabled: !!handle,
+      queryKey: getGetCreatorCollabQueryKey(handle),
+      retry: false,
+    },
+  });
 
   const [links, setLinks] = useState<PlatformLink[]>([]);
   const [xHandle, setXHandle] = useState("");
@@ -46,13 +55,19 @@ export default function DashboardProfilePage() {
     setFollowerCount(
       creator.followerCount != null ? String(creator.followerCount) : "",
     );
-    setCollabFastUrl(creator.collabFastUrl ?? "");
     setTestingVerified(creator.testingVerified);
     setLastTestedAt(toDateInput(creator.lastTestedAt));
   }, [creator]);
 
+  useEffect(() => {
+    setCollabFastUrl(collab?.collabFastUrl ?? "");
+  }, [collab]);
+
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: getGetCreatorQueryKey(handle) });
+    queryClient.invalidateQueries({
+      queryKey: getGetCreatorCollabQueryKey(handle),
+    });
   };
 
   const updateProfile = useUpdateCreatorProfile({

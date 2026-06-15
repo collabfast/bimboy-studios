@@ -22,6 +22,7 @@ export const creatorsTable = pgTable("creators", {
   avatarUrl: text("avatar_url").notNull(),
   bio: text("bio"),
   verified: boolean("verified").notNull().default(false),
+  ownerUserId: text("owner_user_id"),
   platformLinks: jsonb("platform_links")
     .$type<PlatformLink[]>()
     .notNull()
