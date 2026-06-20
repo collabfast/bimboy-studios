@@ -115,7 +115,8 @@ export const ListCreatorsResponse = zod.array(ListCreatorsResponseItem)
  */
 export const CreateCreatorBody = zod.object({
   "displayName": zod.string(),
-  "handle": zod.string().optional()
+  "handle": zod.string().optional(),
+  "xHandle": zod.string().nullish()
 })
 
 

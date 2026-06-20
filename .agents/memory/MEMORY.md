@@ -1,2 +1,3 @@
 - [Orval query hooks](orval-query-hooks.md) — passing options.query to generated useGetX hooks needs an explicit queryKey or tsc (not LSP) fails; bimboy build needs PORT+BASE_PATH.
 - [Creator ownership & CollabFast access](creator-ownership-model.md) — claim-on-first-edit must be atomic in the UPDATE WHERE; collab link is creator-only via authed endpoint, never public DTO or localStorage gate.
+- [Bimboy account URL & X connect](bimboy-account-links.md) — public creator URL is www.bimboy.com/<handle>/ (use links.ts); signup X-connect needs Supabase Twitter provider enabled.

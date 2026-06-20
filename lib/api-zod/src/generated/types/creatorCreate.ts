@@ -9,4 +9,5 @@
 export interface CreatorCreate {
   displayName: string;
   handle?: string;
+  xHandle?: string | null;
 }

@@ -596,6 +596,7 @@ components:
       properties:
         displayName: { type: string }
         handle: { type: string }
+        xHandle: { type: string, nullable: true }
     CreatorProfileUpdate:
       type: object
       properties:

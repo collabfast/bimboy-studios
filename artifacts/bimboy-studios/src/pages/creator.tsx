@@ -18,6 +18,7 @@ import {
   type FeedItem,
 } from "@workspace/api-client-react";
 import { useAuth } from "@/lib/auth";
+import { accountUrl, accountUrlLabel } from "@/lib/links";
 
 function formatDuration(s: number) {
   const m = Math.floor(s / 60);
@@ -100,6 +101,14 @@ export default function CreatorPage() {
             )}
           </div>
           <div className="creator-hero-handle">@{creator.handle}</div>
+          <a
+            href={accountUrl(creator.handle)}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="creator-hero-url"
+          >
+            {accountUrlLabel(creator.handle)}
+          </a>
           {creator.bio && <p className="creator-hero-bio">{creator.bio}</p>}
           <div className="creator-hero-stats">
             <span>

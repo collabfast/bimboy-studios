@@ -133,6 +133,11 @@ router.post("/creators", requireAuth, async (req, res) => {
       : displayName;
   const base = slugifyHandle(requested);
 
+  const xHandle =
+    typeof body.xHandle === "string" && body.xHandle.trim()
+      ? body.xHandle.replace(/^@/, "").trim()
+      : null;
+
   for (let attempt = 0; attempt < 100; attempt++) {
     const handle = handleCandidate(base, attempt);
     try {
@@ -143,6 +148,7 @@ router.post("/creators", requireAuth, async (req, res) => {
           displayName,
           avatarUrl: `https://i.pravatar.cc/120?u=${encodeURIComponent(handle)}`,
           ownerUserId: req.userId!,
+          xHandle,
         })
         .returning();
       res.status(201).json(toCreatorDto(created));

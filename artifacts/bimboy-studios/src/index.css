@@ -922,6 +922,8 @@ button.swipe-brand:hover { opacity: .85; }
 }
 .creator-hero-name { font-size: 28px; font-weight: 700; color: #fff; }
 .creator-hero-handle { color: rgba(255,255,255,.55); font-size: 14px; margin-top: 4px; }
+.creator-hero-url { display: inline-block; color: #ff5fa2; font-size: 13px; margin-top: 6px; text-decoration: none; }
+.creator-hero-url:hover { text-decoration: underline; }
 .creator-hero-bio { color: rgba(255,255,255,.8); font-size: 15px; line-height: 1.5; margin: 12px 0 0; max-width: 540px; }
 .creator-hero-stats { display: flex; gap: 24px; margin-top: 16px; color: rgba(255,255,255,.7); font-size: 14px; }
 .creator-hero-stats strong { color: #fff; font-size: 18px; }

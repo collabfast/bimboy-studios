@@ -36,6 +36,7 @@ export interface CollabLink {
 export interface CreatorCreate {
   displayName: string;
   handle?: string;
+  xHandle?: string | null;
 }
 
 export interface CreatorProfileUpdate {

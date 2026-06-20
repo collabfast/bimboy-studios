@@ -11,6 +11,7 @@ import {
   type PlatformLink,
 } from "@workspace/api-client-react";
 import { useDashboardCreators } from "@/hooks/use-dashboard-creators";
+import { accountUrl, accountUrlLabel } from "@/lib/links";
 
 function toDateInput(iso: string | null | undefined): string {
   if (!iso) return "";
@@ -44,6 +45,18 @@ export default function DashboardProfilePage() {
       retry: false,
     },
   });
+
+  const [copied, setCopied] = useState(false);
+  const copyAccountUrl = async () => {
+    if (!handle) return;
+    try {
+      await navigator.clipboard.writeText(accountUrl(handle));
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      /* clipboard unavailable */
+    }
+  };
 
   const [links, setLinks] = useState<PlatformLink[]>([]);
   const [xHandle, setXHandle] = useState("");
@@ -128,6 +141,28 @@ export default function DashboardProfilePage() {
               Manage external platform links, X follower count, health & STI
               testing status, and the CollabFast link shown to other creators.
             </p>
+            {handle && (
+              <div className="mt-5 flex flex-wrap items-center gap-3">
+                <span className="text-xs uppercase tracking-[0.18em] text-white/40">
+                  Your page
+                </span>
+                <a
+                  href={accountUrl(handle)}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="rounded-full border border-pink-400/30 bg-pink-500/10 px-4 py-1.5 text-sm font-medium text-pink-200 transition hover:border-pink-400/60"
+                >
+                  {accountUrlLabel(handle)}
+                </a>
+                <button
+                  type="button"
+                  onClick={copyAccountUrl}
+                  className="rounded-full border border-white/10 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/30"
+                >
+                  {copied ? "Copied!" : "Copy link"}
+                </button>
+              </div>
+            )}
           </div>
           <label className="flex flex-col gap-1.5 text-xs uppercase tracking-[0.18em] text-white/45">
             {isClaimMode ? "Claim a profile" : "Your profile"}
