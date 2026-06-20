@@ -31,6 +31,27 @@ export default function LoginPage() {
     }
   }, [user, authLoading, navigate]);
 
+  async function onResetPassword() {
+    setError(null);
+    setNotice(null);
+    if (!email) {
+      setError("Enter your email above, then tap reset.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: authRedirectUrl(),
+      });
+      if (error) throw error;
+      setNotice("Password reset link sent. Check your inbox.");
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
@@ -124,6 +145,19 @@ export default function LoginPage() {
                 />
               </div>
             </label>
+          )}
+
+          {mode === "signin" && (
+            <div className="text-right">
+              <button
+                type="button"
+                onClick={onResetPassword}
+                disabled={busy}
+                className="text-xs font-medium text-white/50 underline-offset-4 transition hover:text-pink-300 hover:underline disabled:opacity-60"
+              >
+                Forgot password?
+              </button>
+            </div>
           )}
 
           {error && (
