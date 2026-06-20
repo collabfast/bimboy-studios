@@ -1,5 +1,11 @@
 import type { Request, Response, NextFunction, RequestHandler } from "express";
-import { jwtVerify } from "jose";
+import {
+  jwtVerify,
+  createRemoteJWKSet,
+  decodeProtectedHeader,
+  decodeJwt,
+  type JWTPayload,
+} from "jose";
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -11,27 +17,88 @@ declare global {
   }
 }
 
+// Legacy HS256 verification uses the project's shared JWT secret. Newer Supabase
+// projects sign tokens with asymmetric keys (ES256/RS256) served from a JWKS
+// endpoint, so the secret may be absent — we only require it for HS* tokens.
 const SECRET = process.env["SUPABASE_JWT_SECRET"];
-if (!SECRET) {
-  throw new Error("SUPABASE_JWT_SECRET is required for auth middleware");
+const SECRET_BYTES = SECRET ? new TextEncoder().encode(SECRET) : null;
+
+// Base Supabase URL, used to build the expected issuer and JWKS URL so we never
+// fetch keys from an issuer we don't trust.
+const SUPABASE_URL = (
+  process.env["VITE_SUPABASE_URL"] ||
+  process.env["SUPABASE_URL"] ||
+  ""
+).replace(/\/$/, "");
+const EXPECTED_ISSUER = SUPABASE_URL ? `${SUPABASE_URL}/auth/v1` : null;
+
+const ASYMMETRIC_ALGS = ["ES256", "RS256"];
+
+// Cache one remote JWKS per issuer; createRemoteJWKSet handles its own caching
+// and key rotation internally.
+const jwksByIssuer = new Map<string, ReturnType<typeof createRemoteJWKSet>>();
+
+function getJwks(issuer: string) {
+  let jwks = jwksByIssuer.get(issuer);
+  if (!jwks) {
+    jwks = createRemoteJWKSet(new URL(`${issuer}/.well-known/jwks.json`));
+    jwksByIssuer.set(issuer, jwks);
+  }
+  return jwks;
 }
-const SECRET_BYTES = new TextEncoder().encode(SECRET);
+
+// Only trust issuers that match the configured Supabase project, or — if the URL
+// isn't configured — any *.supabase.co auth issuer.
+function resolveTrustedIssuer(token: string): string {
+  if (EXPECTED_ISSUER) return EXPECTED_ISSUER;
+  const claims = decodeJwt(token);
+  const iss = typeof claims.iss === "string" ? claims.iss : "";
+  let host: string;
+  try {
+    host = new URL(iss).host;
+  } catch {
+    throw new Error("Token has an invalid issuer");
+  }
+  if (!host.endsWith(".supabase.co")) {
+    throw new Error("Token issuer is not a trusted Supabase project");
+  }
+  return iss.replace(/\/$/, "");
+}
+
+async function verifyToken(token: string) {
+  const header = decodeProtectedHeader(token);
+  const alg = typeof header.alg === "string" ? header.alg : "";
+
+  let payload: JWTPayload;
+  if (alg.startsWith("HS")) {
+    if (!SECRET_BYTES) {
+      throw new Error("SUPABASE_JWT_SECRET is not configured for HS256 tokens");
+    }
+    ({ payload } = await jwtVerify(token, SECRET_BYTES, {
+      algorithms: ["HS256"],
+    }));
+  } else if (ASYMMETRIC_ALGS.includes(alg)) {
+    const issuer = resolveTrustedIssuer(token);
+    ({ payload } = await jwtVerify(token, getJwks(issuer), {
+      algorithms: ASYMMETRIC_ALGS,
+      issuer,
+    }));
+  } else {
+    throw new Error(`Unsupported token algorithm: ${alg || "none"}`);
+  }
+
+  const sub = typeof payload.sub === "string" ? payload.sub : null;
+  if (!sub) throw new Error("Token missing sub claim");
+  const email =
+    typeof payload["email"] === "string" ? (payload["email"] as string) : undefined;
+  return { sub, email };
+}
 
 function extractToken(req: Request): string | null {
   const header = req.headers.authorization;
   if (!header) return null;
   const m = /^Bearer\s+(.+)$/i.exec(header);
   return m ? m[1] : null;
-}
-
-async function verifyToken(token: string) {
-  const { payload } = await jwtVerify(token, SECRET_BYTES, {
-    algorithms: ["HS256"],
-  });
-  const sub = typeof payload.sub === "string" ? payload.sub : null;
-  if (!sub) throw new Error("Token missing sub claim");
-  const email = typeof payload["email"] === "string" ? (payload["email"] as string) : undefined;
-  return { sub, email };
 }
 
 export const optionalAuth: RequestHandler = async (req, _res, next) => {
