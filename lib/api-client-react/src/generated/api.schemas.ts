@@ -33,6 +33,11 @@ export interface CollabLink {
   collabFastUrl: string | null;
 }
 
+export interface CreatorCreate {
+  displayName: string;
+  handle?: string;
+}
+
 export interface CreatorProfileUpdate {
   bio?: string | null;
   platformLinks?: PlatformLink[];

@@ -64,6 +64,25 @@ paths:
               schema:
                 type: array
                 items: { $ref: "#/components/schemas/Creator" }
+    post:
+      operationId: createCreator
+      tags: [creators]
+      summary: Create a creator profile owned by the signed-in user (onboarding)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreatorCreate" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Creator" }
+        "400": { description: Invalid request }
+        "401": { description: Authentication required }
   /me/creators:
     get:
       operationId: listMyCreators
@@ -571,6 +590,12 @@ components:
       properties:
         label: { type: string }
         url: { type: string }
+    CreatorCreate:
+      type: object
+      required: [displayName]
+      properties:
+        displayName: { type: string }
+        handle: { type: string }
     CreatorProfileUpdate:
       type: object
       properties:

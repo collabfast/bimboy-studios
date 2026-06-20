@@ -111,6 +111,15 @@ export const ListCreatorsResponse = zod.array(ListCreatorsResponseItem)
 
 
 /**
+ * @summary Create a creator profile owned by the signed-in user (onboarding)
+ */
+export const CreateCreatorBody = zod.object({
+  "displayName": zod.string(),
+  "handle": zod.string().optional()
+})
+
+
+/**
  * @summary Creators owned by the signed-in user
  */
 export const ListMyCreatorsResponseItem = zod.object({

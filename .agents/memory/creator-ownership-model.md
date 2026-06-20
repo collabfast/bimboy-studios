@@ -45,3 +45,15 @@ once and rejected in review). Read it only via authenticated
 **Why:** CollabFast links are a creator-to-creator collaboration affordance, not
 fan-facing. A localStorage "viewer mode" toggle is NOT an acceptable gate — it is
 trivially bypassable; the gate must be server-side.
+
+## Onboarding creates a creator row directly (POST /creators)
+Onboarding (signup page) creates a creator via authed `POST /creators` with
+`ownerUserId = req.userId` set at insert — this is the *other* ownership entry
+point besides claim-on-first-edit. Handle is slugified from displayName and the
+insert is retried on Postgres unique-violation (`err.code === "23505"`), not via
+read-then-insert, because the handle column has a unique index and concurrent
+same-name signups otherwise 500.
+
+**Why:** read-then-pick-unique-handle has a TOCTOU race; only catching 23505 on
+the actual INSERT is race-safe. Fans get no creator row — onboarding only stores
+a localStorage flag and routes them to /feed.

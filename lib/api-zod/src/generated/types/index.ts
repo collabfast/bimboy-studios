@@ -10,6 +10,7 @@ export * from './collabLink';
 export * from './consentDocument';
 export * from './consentDocumentRequest';
 export * from './creator';
+export * from './creatorCreate';
 export * from './creatorEarnings';
 export * from './creatorProfileUpdate';
 export * from './creatorRanking';

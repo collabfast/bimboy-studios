@@ -24,6 +24,7 @@ import type {
   ConsentDocument,
   ConsentDocumentRequest,
   Creator,
+  CreatorCreate,
   CreatorEarnings,
   CreatorProfileUpdate,
   CreatorRanking,
@@ -296,6 +297,77 @@ export function useListCreators<TData = Awaited<ReturnType<typeof listCreators>>
 
 
 
+
+export const getCreateCreatorUrl = () => {
+
+
+
+
+  return `/api/creators`
+}
+
+/**
+ * @summary Create a creator profile owned by the signed-in user (onboarding)
+ */
+export const createCreator = async (creatorCreate: CreatorCreate, options?: RequestInit): Promise<Creator> => {
+
+  return customFetch<Creator>(getCreateCreatorUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      creatorCreate,)
+  }
+);}
+
+
+
+
+export const getCreateCreatorMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createCreator>>, TError,{data: BodyType<CreatorCreate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createCreator>>, TError,{data: BodyType<CreatorCreate>}, TContext> => {
+
+const mutationKey = ['createCreator'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createCreator>>, {data: BodyType<CreatorCreate>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createCreator(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateCreatorMutationResult = NonNullable<Awaited<ReturnType<typeof createCreator>>>
+    export type CreateCreatorMutationBody = BodyType<CreatorCreate>
+    export type CreateCreatorMutationError = ErrorType<void>
+
+    /**
+ * @summary Create a creator profile owned by the signed-in user (onboarding)
+ */
+export const useCreateCreator = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createCreator>>, TError,{data: BodyType<CreatorCreate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createCreator>>,
+        TError,
+        {data: BodyType<CreatorCreate>},
+        TContext
+      > => {
+      return useMutation(getCreateCreatorMutationOptions(options));
+    }
 
 export const getListMyCreatorsUrl = () => {
 

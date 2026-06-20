@@ -85,6 +85,77 @@ router.get("/creators", async (_req, res) => {
   res.json(rows.map(toCreatorDto));
 });
 
+// Turn a display name (or requested handle) into a url-safe handle: lowercase,
+// alphanumeric only, collapsed. Falls back to "creator" when nothing is left.
+function slugifyHandle(input: string): string {
+  const slug = input
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[^a-z0-9]+/g, "")
+    .slice(0, 30);
+  return slug || "creator";
+}
+
+// Build a handle candidate for attempt n: the bare base first, then base2,
+// base3, … When attempts are exhausted, fall back to a time-based suffix so a
+// pathological run still terminates with a unique value.
+function handleCandidate(base: string, attempt: number): string {
+  if (attempt === 0) return base;
+  if (attempt < 50) return `${base}${attempt + 1}`;
+  return `${base}${Date.now().toString(36)}`;
+}
+
+// Postgres unique-violation error code (handle has a unique index).
+function isUniqueViolation(err: unknown): boolean {
+  return (
+    typeof err === "object" &&
+    err !== null &&
+    (err as { code?: string }).code === "23505"
+  );
+}
+
+// Onboarding: create a creator profile owned by the signed-in user. Handle is
+// derived from the display name (or a requested handle). Insert is retried on a
+// unique-constraint violation so concurrent signups for the same base handle
+// resolve to distinct handles instead of surfacing a 500.
+router.post("/creators", requireAuth, async (req, res) => {
+  const body = (req.body ?? {}) as Record<string, unknown>;
+  const displayName =
+    typeof body.displayName === "string" ? body.displayName.trim() : "";
+  if (!displayName) {
+    res.status(400).json({ error: "displayName is required" });
+    return;
+  }
+
+  const requested =
+    typeof body.handle === "string" && body.handle.trim()
+      ? body.handle
+      : displayName;
+  const base = slugifyHandle(requested);
+
+  for (let attempt = 0; attempt < 100; attempt++) {
+    const handle = handleCandidate(base, attempt);
+    try {
+      const [created] = await db
+        .insert(creatorsTable)
+        .values({
+          handle,
+          displayName,
+          avatarUrl: `https://i.pravatar.cc/120?u=${encodeURIComponent(handle)}`,
+          ownerUserId: req.userId!,
+        })
+        .returning();
+      res.status(201).json(toCreatorDto(created));
+      return;
+    } catch (err) {
+      if (isUniqueViolation(err)) continue;
+      throw err;
+    }
+  }
+
+  res.status(409).json({ error: "Could not allocate a unique handle" });
+});
+
 // Creators owned by the signed-in user. Drives the dashboard so a creator
 // manages their own page(s) instead of picking from a global operator list.
 router.get("/me/creators", requireAuth, async (req, res) => {
