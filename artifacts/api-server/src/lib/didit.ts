@@ -140,20 +140,25 @@ export function verifyWebhook(args: {
   const now = Math.floor(Date.now() / 1000);
   if (Math.abs(now - incoming) > MAX_SKEW_SECONDS) return false;
 
-  // Most reliable: HMAC over "timestamp:session_id:status:webhook_type".
+  // Primary: HMAC over the exact raw request body bytes. This is Didit's
+  // documented signing method (X-Signature) and is immune to canonical-format
+  // ambiguity.
+  if (signatureRaw && rawBody) {
+    if (safeEqualHex(hmacHex(secret, rawBody), signatureRaw)) return true;
+  }
+
+  // Secondary: the "Simple" canonical signature, which signs the
+  // "timestamp:session_id:status:webhook_type" string. The timestamp here is
+  // the validated X-Timestamp header value (not the body field), matching what
+  // Didit signs.
   if (signatureSimple) {
     const canonical = [
-      parsedBody["timestamp"] ?? "",
+      timestamp,
       parsedBody["session_id"] ?? "",
       parsedBody["status"] ?? "",
       parsedBody["webhook_type"] ?? "",
     ].join(":");
     if (safeEqualHex(hmacHex(secret, canonical), signatureSimple)) return true;
-  }
-
-  // Fallback: HMAC over the exact raw request body bytes.
-  if (signatureRaw && rawBody) {
-    if (safeEqualHex(hmacHex(secret, rawBody), signatureRaw)) return true;
   }
 
   return false;
