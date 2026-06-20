@@ -9,6 +9,20 @@ export interface HealthStatus {
   status: string;
 }
 
+/**
+ * Didit ID/age (KYC) verification status. Distinct from `verified` (creator badge) and `testingVerified` (STI/health). Creators must be `approved` before they can publish drops or go live.
+ */
+export type CreatorIdVerificationStatus = typeof CreatorIdVerificationStatus[keyof typeof CreatorIdVerificationStatus];
+
+
+export const CreatorIdVerificationStatus = {
+  not_started: 'not_started',
+  pending: 'pending',
+  in_review: 'in_review',
+  approved: 'approved',
+  declined: 'declined',
+} as const;
+
 export interface PlatformLink {
   label: string;
   url: string;
@@ -27,10 +41,50 @@ export interface Creator {
   followersUpdatedAt?: string | null;
   lastTestedAt?: string | null;
   testingVerified: boolean;
+  /** Didit ID/age (KYC) verification status. Distinct from `verified` (creator badge) and `testingVerified` (STI/health). Creators must be `approved` before they can publish drops or go live. */
+  idVerificationStatus: CreatorIdVerificationStatus;
 }
 
 export interface CollabLink {
   collabFastUrl: string | null;
+}
+
+export type VerificationStatusStatus = typeof VerificationStatusStatus[keyof typeof VerificationStatusStatus];
+
+
+export const VerificationStatusStatus = {
+  not_started: 'not_started',
+  pending: 'pending',
+  in_review: 'in_review',
+  approved: 'approved',
+  declined: 'declined',
+} as const;
+
+export interface VerificationStatus {
+  status: VerificationStatusStatus;
+  sessionId?: string | null;
+}
+
+export type VerificationSessionStatus = typeof VerificationSessionStatus[keyof typeof VerificationSessionStatus];
+
+
+export const VerificationSessionStatus = {
+  not_started: 'not_started',
+  pending: 'pending',
+  in_review: 'in_review',
+  approved: 'approved',
+  declined: 'declined',
+} as const;
+
+export interface VerificationSession {
+  /** Didit hosted verification URL to redirect the creator to. */
+  url: string;
+  status: VerificationSessionStatus;
+}
+
+export interface VerificationSessionRequest {
+  /** Absolute http(s) URL the browser should return to after the hosted flow. The client passes its own origin + base path so the redirect lands inside the app. */
+  callbackUrl?: string;
 }
 
 export interface CreatorCreate {

@@ -2,6 +2,7 @@ import express, { type Express } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
 import router from "./routes";
+import diditWebhookRouter from "./routes/didit-webhook";
 import { logger } from "./lib/logger";
 
 const app: Express = express();
@@ -26,6 +27,11 @@ app.use(
   }),
 );
 app.use(cors());
+
+// Mount the Didit webhook BEFORE express.json so its raw body parser can verify
+// the HMAC signature against the exact bytes Didit signed.
+app.use(diditWebhookRouter);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

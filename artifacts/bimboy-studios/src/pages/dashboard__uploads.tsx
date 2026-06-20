@@ -1,10 +1,18 @@
 import type { ChangeEvent, FormEvent } from "react";
 import { useMemo, useState } from "react";
+import { Link } from "wouter";
+import { Lock } from "lucide-react";
 import { cloudflareStreamConfig } from "@/lib/placeholders";
+import { useDashboardCreators } from "@/hooks/use-dashboard-creators";
 
 type UploadState = "idle" | "uploading" | "success" | "error";
 
 export default function DashboardUploadsPage() {
+  const { creators, isClaimMode } = useDashboardCreators();
+  const ownedCreator = !isClaimMode ? creators[0] : undefined;
+  // Publishing is locked until Didit returns an approved identity decision.
+  const canPublish = ownedCreator?.idVerificationStatus === "approved";
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("19");
@@ -32,6 +40,11 @@ export default function DashboardUploadsPage() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (!canPublish) {
+      setUploadState("error");
+      return;
+    }
 
     if (!selectedFile || !title.trim()) {
       setUploadState("error");
@@ -154,10 +167,32 @@ export default function DashboardUploadsPage() {
             </label>
           </div>
 
+          {!canPublish ? (
+            <div className="mt-8 flex items-start gap-3 rounded-[24px] border border-amber-400/30 bg-amber-500/10 px-5 py-4">
+              <Lock className="mt-0.5 h-5 w-5 shrink-0 text-amber-200" />
+              <div className="text-sm leading-7 text-amber-100/90">
+                <p className="font-semibold text-amber-100">
+                  Publishing is locked until your identity is verified.
+                </p>
+                <p className="mt-1">
+                  Complete the secure ID + age check to unlock uploads.{" "}
+                  <Link
+                    href="/dashboard/profile"
+                    className="font-semibold text-amber-200 underline underline-offset-4 hover:text-amber-100"
+                  >
+                    Verify your identity
+                  </Link>
+                  .
+                </p>
+              </div>
+            </div>
+          ) : null}
+
           <div className="mt-8 flex flex-wrap gap-4">
             <button
               type="submit"
-              className="rounded-2xl bg-gradient-to-r from-pink-500 to-violet-500 px-6 py-3 font-semibold text-white shadow-lg shadow-pink-500/20 transition hover:brightness-110"
+              disabled={!canPublish}
+              className="rounded-2xl bg-gradient-to-r from-pink-500 to-violet-500 px-6 py-3 font-semibold text-white shadow-lg shadow-pink-500/20 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:brightness-100"
             >
               Start Upload
             </button>

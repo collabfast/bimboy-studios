@@ -58,7 +58,8 @@ export const GetFeedResponse = zod.object({
   "followerCount": zod.number().nullish(),
   "followersUpdatedAt": zod.coerce.date().nullish(),
   "lastTestedAt": zod.coerce.date().nullish(),
-  "testingVerified": zod.boolean()
+  "testingVerified": zod.boolean(),
+  "idVerificationStatus": zod.enum(['not_started', 'pending', 'in_review', 'approved', 'declined']).describe('Didit ID\/age (KYC) verification status. Distinct from `verified` (creator badge) and `testingVerified` (STI\/health). Creators must be `approved` before they can publish drops or go live.')
 }),
   "participants": zod.array(zod.object({
   "creator": zod.object({
@@ -76,7 +77,8 @@ export const GetFeedResponse = zod.object({
   "followerCount": zod.number().nullish(),
   "followersUpdatedAt": zod.coerce.date().nullish(),
   "lastTestedAt": zod.coerce.date().nullish(),
-  "testingVerified": zod.boolean()
+  "testingVerified": zod.boolean(),
+  "idVerificationStatus": zod.enum(['not_started', 'pending', 'in_review', 'approved', 'declined']).describe('Didit ID\/age (KYC) verification status. Distinct from `verified` (creator badge) and `testingVerified` (STI\/health). Creators must be `approved` before they can publish drops or go live.')
 }),
   "splitBps": zod.number().describe('Revenue share in basis points (0-10000)')
 })),
@@ -105,7 +107,8 @@ export const ListCreatorsResponseItem = zod.object({
   "followerCount": zod.number().nullish(),
   "followersUpdatedAt": zod.coerce.date().nullish(),
   "lastTestedAt": zod.coerce.date().nullish(),
-  "testingVerified": zod.boolean()
+  "testingVerified": zod.boolean(),
+  "idVerificationStatus": zod.enum(['not_started', 'pending', 'in_review', 'approved', 'declined']).describe('Didit ID\/age (KYC) verification status. Distinct from `verified` (creator badge) and `testingVerified` (STI\/health). Creators must be `approved` before they can publish drops or go live.')
 })
 export const ListCreatorsResponse = zod.array(ListCreatorsResponseItem)
 
@@ -138,7 +141,8 @@ export const ListMyCreatorsResponseItem = zod.object({
   "followerCount": zod.number().nullish(),
   "followersUpdatedAt": zod.coerce.date().nullish(),
   "lastTestedAt": zod.coerce.date().nullish(),
-  "testingVerified": zod.boolean()
+  "testingVerified": zod.boolean(),
+  "idVerificationStatus": zod.enum(['not_started', 'pending', 'in_review', 'approved', 'declined']).describe('Didit ID\/age (KYC) verification status. Distinct from `verified` (creator badge) and `testingVerified` (STI\/health). Creators must be `approved` before they can publish drops or go live.')
 })
 export const ListMyCreatorsResponse = zod.array(ListMyCreatorsResponseItem)
 
@@ -162,7 +166,8 @@ export const GetCreatorResponse = zod.object({
   "followerCount": zod.number().nullish(),
   "followersUpdatedAt": zod.coerce.date().nullish(),
   "lastTestedAt": zod.coerce.date().nullish(),
-  "testingVerified": zod.boolean()
+  "testingVerified": zod.boolean(),
+  "idVerificationStatus": zod.enum(['not_started', 'pending', 'in_review', 'approved', 'declined']).describe('Didit ID\/age (KYC) verification status. Distinct from `verified` (creator badge) and `testingVerified` (STI\/health). Creators must be `approved` before they can publish drops or go live.')
 })
 
 
@@ -200,7 +205,8 @@ export const GetCreatorVideosResponse = zod.object({
   "followerCount": zod.number().nullish(),
   "followersUpdatedAt": zod.coerce.date().nullish(),
   "lastTestedAt": zod.coerce.date().nullish(),
-  "testingVerified": zod.boolean()
+  "testingVerified": zod.boolean(),
+  "idVerificationStatus": zod.enum(['not_started', 'pending', 'in_review', 'approved', 'declined']).describe('Didit ID\/age (KYC) verification status. Distinct from `verified` (creator badge) and `testingVerified` (STI\/health). Creators must be `approved` before they can publish drops or go live.')
 }),
   "participants": zod.array(zod.object({
   "creator": zod.object({
@@ -218,7 +224,8 @@ export const GetCreatorVideosResponse = zod.object({
   "followerCount": zod.number().nullish(),
   "followersUpdatedAt": zod.coerce.date().nullish(),
   "lastTestedAt": zod.coerce.date().nullish(),
-  "testingVerified": zod.boolean()
+  "testingVerified": zod.boolean(),
+  "idVerificationStatus": zod.enum(['not_started', 'pending', 'in_review', 'approved', 'declined']).describe('Didit ID\/age (KYC) verification status. Distinct from `verified` (creator badge) and `testingVerified` (STI\/health). Creators must be `approved` before they can publish drops or go live.')
 }),
   "splitBps": zod.number().describe('Revenue share in basis points (0-10000)')
 })),
@@ -264,7 +271,8 @@ export const UpdateCreatorProfileResponse = zod.object({
   "followerCount": zod.number().nullish(),
   "followersUpdatedAt": zod.coerce.date().nullish(),
   "lastTestedAt": zod.coerce.date().nullish(),
-  "testingVerified": zod.boolean()
+  "testingVerified": zod.boolean(),
+  "idVerificationStatus": zod.enum(['not_started', 'pending', 'in_review', 'approved', 'declined']).describe('Didit ID\/age (KYC) verification status. Distinct from `verified` (creator badge) and `testingVerified` (STI\/health). Creators must be `approved` before they can publish drops or go live.')
 })
 
 
@@ -302,7 +310,38 @@ export const RefreshCreatorFollowersResponse = zod.object({
   "followerCount": zod.number().nullish(),
   "followersUpdatedAt": zod.coerce.date().nullish(),
   "lastTestedAt": zod.coerce.date().nullish(),
-  "testingVerified": zod.boolean()
+  "testingVerified": zod.boolean(),
+  "idVerificationStatus": zod.enum(['not_started', 'pending', 'in_review', 'approved', 'declined']).describe('Didit ID\/age (KYC) verification status. Distinct from `verified` (creator badge) and `testingVerified` (STI\/health). Creators must be `approved` before they can publish drops or go live.')
+})
+
+
+/**
+ * @summary Read the creator's Didit ID-verification status (owner only)
+ */
+export const GetCreatorVerificationParams = zod.object({
+  "handle": zod.coerce.string()
+})
+
+export const GetCreatorVerificationResponse = zod.object({
+  "status": zod.enum(['not_started', 'pending', 'in_review', 'approved', 'declined']),
+  "sessionId": zod.string().nullish()
+})
+
+
+/**
+ * @summary Start a Didit ID-verification session and get the hosted URL (owner only)
+ */
+export const CreateCreatorVerificationSessionParams = zod.object({
+  "handle": zod.coerce.string()
+})
+
+export const CreateCreatorVerificationSessionBody = zod.object({
+  "callbackUrl": zod.string().optional().describe('Absolute http(s) URL the browser should return to after the hosted flow. The client passes its own origin + base path so the redirect lands inside the app.')
+})
+
+export const CreateCreatorVerificationSessionResponse = zod.object({
+  "url": zod.string().describe('Didit hosted verification URL to redirect the creator to.'),
+  "status": zod.enum(['not_started', 'pending', 'in_review', 'approved', 'declined'])
 })
 
 
@@ -339,7 +378,8 @@ export const GetLibraryResponse = zod.object({
   "followerCount": zod.number().nullish(),
   "followersUpdatedAt": zod.coerce.date().nullish(),
   "lastTestedAt": zod.coerce.date().nullish(),
-  "testingVerified": zod.boolean()
+  "testingVerified": zod.boolean(),
+  "idVerificationStatus": zod.enum(['not_started', 'pending', 'in_review', 'approved', 'declined']).describe('Didit ID\/age (KYC) verification status. Distinct from `verified` (creator badge) and `testingVerified` (STI\/health). Creators must be `approved` before they can publish drops or go live.')
 }),
   "participants": zod.array(zod.object({
   "creator": zod.object({
@@ -357,7 +397,8 @@ export const GetLibraryResponse = zod.object({
   "followerCount": zod.number().nullish(),
   "followersUpdatedAt": zod.coerce.date().nullish(),
   "lastTestedAt": zod.coerce.date().nullish(),
-  "testingVerified": zod.boolean()
+  "testingVerified": zod.boolean(),
+  "idVerificationStatus": zod.enum(['not_started', 'pending', 'in_review', 'approved', 'declined']).describe('Didit ID\/age (KYC) verification status. Distinct from `verified` (creator badge) and `testingVerified` (STI\/health). Creators must be `approved` before they can publish drops or go live.')
 }),
   "splitBps": zod.number().describe('Revenue share in basis points (0-10000)')
 })),

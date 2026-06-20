@@ -11,6 +11,11 @@ import { eq, desc, or, and, isNull, inArray } from "drizzle-orm";
 import { buildFeedItems, toCreatorDto } from "../lib/feed-items";
 import { requireAuth } from "../middleware/auth";
 import { fetchXFollowers, hasXToken, isFollowersStale } from "../lib/x-followers";
+import {
+  createSession,
+  getDiditConfig,
+  DiditNotConfiguredError,
+} from "../lib/didit";
 
 // Auto-refresh the cached follower count when it has gone stale (or when
 // `force` is set). Re-fetches from the X API and persists the new count.
@@ -425,5 +430,112 @@ router.get("/creators/:handle/collab", requireAuth, async (req, res) => {
   }
   res.json({ collabFastUrl: creator.collabFastUrl ?? null });
 });
+
+// Read the creator's Didit ID-verification status. Owner-only — this is private
+// onboarding state, not part of the public profile surface.
+router.get("/creators/:handle/verification", requireAuth, async (req, res) => {
+  const handle = req.params.handle as string;
+  const [creator] = await db
+    .select()
+    .from(creatorsTable)
+    .where(eq(creatorsTable.handle, handle))
+    .limit(1);
+  if (!creator) {
+    res.status(404).json({ error: "Not found" });
+    return;
+  }
+  if (creator.ownerUserId !== req.userId) {
+    res.status(403).json({ error: "You do not own this creator profile" });
+    return;
+  }
+  res.json({
+    status: toCreatorDto(creator).idVerificationStatus,
+    sessionId: creator.diditSessionId ?? null,
+  });
+});
+
+// Start a Didit ID-verification session for the creator and return the hosted
+// URL to redirect the owner to. The authoritative result arrives later via the
+// signed webhook; here we only flip the status to "pending" and persist the
+// session id. Owner-only.
+router.post(
+  "/creators/:handle/verification/session",
+  requireAuth,
+  async (req, res) => {
+    const handle = req.params.handle as string;
+    const [creator] = await db
+      .select()
+      .from(creatorsTable)
+      .where(eq(creatorsTable.handle, handle))
+      .limit(1);
+    if (!creator) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    if (creator.ownerUserId !== req.userId) {
+      res.status(403).json({ error: "You do not own this creator profile" });
+      return;
+    }
+
+    if (!getDiditConfig()) {
+      res.status(502).json({
+        error:
+          "Identity verification is not configured yet. Please try again later.",
+      });
+      return;
+    }
+
+    // Send the browser back to the app after the hosted flow. The client passes
+    // its own origin + base path (so the redirect lands correctly in dev at the
+    // root and in prod under /bimboy-studios/). Fall back to the dev domain.
+    const body = (req.body ?? {}) as Record<string, unknown>;
+    const requestedCallback =
+      typeof body.callbackUrl === "string" && isSafeHttpUrl(body.callbackUrl)
+        ? body.callbackUrl
+        : null;
+    const devDomain = process.env["REPLIT_DEV_DOMAIN"];
+    const fallbackCallback = devDomain
+      ? `https://${devDomain}/dashboard/profile?verify=return`
+      : undefined;
+    const callbackUrl = requestedCallback ?? fallbackCallback;
+    if (!callbackUrl) {
+      res.status(400).json({ error: "A callbackUrl is required" });
+      return;
+    }
+
+    try {
+      const { sessionId, url } = await createSession({
+        vendorData: creator.id,
+        callbackUrl,
+      });
+      const [updated] = await db
+        .update(creatorsTable)
+        .set({ idVerificationStatus: "pending", diditSessionId: sessionId })
+        .where(eq(creatorsTable.id, creator.id))
+        .returning();
+      res.json({
+        url,
+        status: updated
+          ? toCreatorDto(updated).idVerificationStatus
+          : "pending",
+      });
+    } catch (err) {
+      if (err instanceof DiditNotConfiguredError) {
+        res.status(502).json({
+          error:
+            "Identity verification is not configured yet. Please try again later.",
+        });
+        return;
+      }
+      req.log?.error(
+        { err: (err as Error).message },
+        "Didit session creation failed",
+      );
+      res.status(502).json({
+        error: "Could not start identity verification. Please try again.",
+      });
+    }
+  },
+);
 
 export default router;

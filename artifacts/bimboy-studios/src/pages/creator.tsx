@@ -198,6 +198,25 @@ export default function CreatorPage() {
               </div>
             </div>
           </div>
+          <div className="creator-stat-row">
+            {creator.idVerificationStatus === "approved" ? (
+              <ShieldCheck className="h-5 w-5 text-emerald-400" />
+            ) : (
+              <ShieldAlert className="h-5 w-5 text-amber-400" />
+            )}
+            <div>
+              <div className="creator-stat-value">
+                {creator.idVerificationStatus === "approved"
+                  ? "Identity & age verified"
+                  : "Identity verification pending"}
+              </div>
+              <div className="creator-stat-caption">
+                {creator.idVerificationStatus === "approved"
+                  ? "Cleared to publish drops and go live"
+                  : "Publishing locked until ID verification clears"}
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

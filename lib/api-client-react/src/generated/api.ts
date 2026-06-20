@@ -44,6 +44,9 @@ import type {
   PurchaseResponse,
   UploadUrlRequest,
   UploadUrlResponse,
+  VerificationSession,
+  VerificationSessionRequest,
+  VerificationStatus,
   VideoEventRequest,
   VideoStats
 } from './api.schemas';
@@ -805,6 +808,155 @@ export const useRefreshCreatorFollowers = <TError = ErrorType<void | ErrorEnvelo
         TContext
       > => {
       return useMutation(getRefreshCreatorFollowersMutationOptions(options));
+    }
+
+export const getGetCreatorVerificationUrl = (handle: string,) => {
+
+
+
+
+  return `/api/creators/${handle}/verification`
+}
+
+/**
+ * @summary Read the creator's Didit ID-verification status (owner only)
+ */
+export const getCreatorVerification = async (handle: string, options?: RequestInit): Promise<VerificationStatus> => {
+
+  return customFetch<VerificationStatus>(getGetCreatorVerificationUrl(handle),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCreatorVerificationQueryKey = (handle: string,) => {
+    return [
+    `/api/creators/${handle}/verification`
+    ] as const;
+    }
+
+
+export const getGetCreatorVerificationQueryOptions = <TData = Awaited<ReturnType<typeof getCreatorVerification>>, TError = ErrorType<void>>(handle: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCreatorVerification>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCreatorVerificationQueryKey(handle);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCreatorVerification>>> = ({ signal }) => getCreatorVerification(handle, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(handle), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCreatorVerification>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetCreatorVerificationQueryResult = NonNullable<Awaited<ReturnType<typeof getCreatorVerification>>>
+export type GetCreatorVerificationQueryError = ErrorType<void>
+
+
+/**
+ * @summary Read the creator's Didit ID-verification status (owner only)
+ */
+
+export function useGetCreatorVerification<TData = Awaited<ReturnType<typeof getCreatorVerification>>, TError = ErrorType<void>>(
+ handle: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCreatorVerification>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetCreatorVerificationQueryOptions(handle,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateCreatorVerificationSessionUrl = (handle: string,) => {
+
+
+
+
+  return `/api/creators/${handle}/verification/session`
+}
+
+/**
+ * @summary Start a Didit ID-verification session and get the hosted URL (owner only)
+ */
+export const createCreatorVerificationSession = async (handle: string,
+    verificationSessionRequest?: VerificationSessionRequest, options?: RequestInit): Promise<VerificationSession> => {
+
+  return customFetch<VerificationSession>(getCreateCreatorVerificationSessionUrl(handle),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      verificationSessionRequest,)
+  }
+);}
+
+
+
+
+export const getCreateCreatorVerificationSessionMutationOptions = <TError = ErrorType<void | ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createCreatorVerificationSession>>, TError,{handle: string;data?: BodyType<VerificationSessionRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createCreatorVerificationSession>>, TError,{handle: string;data?: BodyType<VerificationSessionRequest>}, TContext> => {
+
+const mutationKey = ['createCreatorVerificationSession'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createCreatorVerificationSession>>, {handle: string;data?: BodyType<VerificationSessionRequest>}> = (props) => {
+          const {handle,data} = props ?? {};
+
+          return  createCreatorVerificationSession(handle,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateCreatorVerificationSessionMutationResult = NonNullable<Awaited<ReturnType<typeof createCreatorVerificationSession>>>
+    export type CreateCreatorVerificationSessionMutationBody = BodyType<VerificationSessionRequest> | undefined
+    export type CreateCreatorVerificationSessionMutationError = ErrorType<void | ErrorEnvelope>
+
+    /**
+ * @summary Start a Didit ID-verification session and get the hosted URL (owner only)
+ */
+export const useCreateCreatorVerificationSession = <TError = ErrorType<void | ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createCreatorVerificationSession>>, TError,{handle: string;data?: BodyType<VerificationSessionRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createCreatorVerificationSession>>,
+        TError,
+        {handle: string;data?: BodyType<VerificationSessionRequest>},
+        TContext
+      > => {
+      return useMutation(getCreateCreatorVerificationSessionMutationOptions(options));
     }
 
 export const getGetLibraryUrl = () => {

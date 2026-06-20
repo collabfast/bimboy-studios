@@ -26,7 +26,29 @@ type CreatorDto = {
   followersUpdatedAt: string | null;
   lastTestedAt: string | null;
   testingVerified: boolean;
+  idVerificationStatus:
+    | "not_started"
+    | "pending"
+    | "in_review"
+    | "approved"
+    | "declined";
 };
+
+// Narrow the free-form DB text column to the public enum, defaulting any
+// unexpected value to "not_started" so the API contract always holds.
+function toIdVerificationStatus(
+  raw: string,
+): CreatorDto["idVerificationStatus"] {
+  switch (raw) {
+    case "pending":
+    case "in_review":
+    case "approved":
+    case "declined":
+      return raw;
+    default:
+      return "not_started";
+  }
+}
 
 export function toCreatorDto(c: Creator): CreatorDto {
   return {
@@ -44,6 +66,7 @@ export function toCreatorDto(c: Creator): CreatorDto {
       : null,
     lastTestedAt: c.lastTestedAt ? c.lastTestedAt.toISOString() : null,
     testingVerified: c.testingVerified,
+    idVerificationStatus: toIdVerificationStatus(c.idVerificationStatus),
   };
 }
 

@@ -201,6 +201,56 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+  /creators/{handle}/verification:
+    get:
+      operationId: getCreatorVerification
+      tags: [creators]
+      summary: Read the creator's Didit ID-verification status (owner only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: handle
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/VerificationStatus" }
+        "403": { description: Not the owner }
+        "404": { description: Not found }
+  /creators/{handle}/verification/session:
+    post:
+      operationId: createCreatorVerificationSession
+      tags: [creators]
+      summary: Start a Didit ID-verification session and get the hosted URL (owner only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: handle
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/VerificationSessionRequest" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/VerificationSession" }
+        "403": { description: Not the owner }
+        "404": { description: Not found }
+        "502":
+          description: Didit unavailable or not configured
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorEnvelope" }
   /library:
     get:
       operationId: getLibrary
@@ -563,7 +613,7 @@ components:
         status: { type: string }
     Creator:
       type: object
-      required: [id, handle, displayName, avatarUrl, verified, platformLinks, testingVerified]
+      required: [id, handle, displayName, avatarUrl, verified, platformLinks, testingVerified, idVerificationStatus]
       properties:
         id: { type: string }
         handle: { type: string }
@@ -579,11 +629,45 @@ components:
         followersUpdatedAt: { type: string, format: date-time, nullable: true }
         lastTestedAt: { type: string, format: date-time, nullable: true }
         testingVerified: { type: boolean }
+        idVerificationStatus:
+          type: string
+          enum: [not_started, pending, in_review, approved, declined]
+          description: >-
+            Didit ID/age (KYC) verification status. Distinct from `verified`
+            (creator badge) and `testingVerified` (STI/health). Creators must be
+            `approved` before they can publish drops or go live.
     CollabLink:
       type: object
       required: [collabFastUrl]
       properties:
         collabFastUrl: { type: string, nullable: true }
+    VerificationStatus:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [not_started, pending, in_review, approved, declined]
+        sessionId: { type: string, nullable: true }
+    VerificationSession:
+      type: object
+      required: [url, status]
+      properties:
+        url:
+          type: string
+          description: Didit hosted verification URL to redirect the creator to.
+        status:
+          type: string
+          enum: [not_started, pending, in_review, approved, declined]
+    VerificationSessionRequest:
+      type: object
+      properties:
+        callbackUrl:
+          type: string
+          description: >-
+            Absolute http(s) URL the browser should return to after the hosted
+            flow. The client passes its own origin + base path so the redirect
+            lands inside the app.
     PlatformLink:
       type: object
       required: [label, url]

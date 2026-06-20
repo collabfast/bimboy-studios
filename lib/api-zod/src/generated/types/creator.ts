@@ -5,6 +5,7 @@
  * Bimboy Studios API
  * OpenAPI spec version: 0.1.0
  */
+import type { CreatorIdVerificationStatus } from './creatorIdVerificationStatus';
 import type { PlatformLink } from './platformLink';
 
 export interface Creator {
@@ -20,4 +21,6 @@ export interface Creator {
   followersUpdatedAt?: Date | null;
   lastTestedAt?: Date | null;
   testingVerified: boolean;
+  /** Didit ID/age (KYC) verification status. Distinct from `verified` (creator badge) and `testingVerified` (STI/health). Creators must be `approved` before they can publish drops or go live. */
+  idVerificationStatus: CreatorIdVerificationStatus;
 }
