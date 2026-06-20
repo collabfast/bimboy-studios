@@ -10,7 +10,7 @@ import { getDiditConfig, mapDiditStatus, verifyWebhook } from "../lib/didit";
 const router: IRouter = Router();
 
 router.post(
-  "/webhooks/didit",
+  "/api/webhooks/didit",
   raw({ type: "*/*" }),
   async (req, res) => {
     const config = getDiditConfig();

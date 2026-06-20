@@ -29,7 +29,8 @@ app.use(
 app.use(cors());
 
 // Mount the Didit webhook BEFORE express.json so its raw body parser can verify
-// the HMAC signature against the exact bytes Didit signed.
+// the HMAC signature against the exact bytes Didit signed. The route lives under
+// /api so the platform proxy routes it to this service in both dev and prod.
 app.use(diditWebhookRouter);
 
 app.use(express.json());
