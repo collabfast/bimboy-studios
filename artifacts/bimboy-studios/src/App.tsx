@@ -49,6 +49,7 @@ import Page_signup from "./pages/signup";
 import Page_about from "./pages/about";
 import Page_admin from "./pages/admin";
 import Page_login from "./pages/login";
+import Page_reset_password from "./pages/reset-password";
 import Page_terms from "./pages/terms";
 import Page_dmca from "./pages/dmca";
 import Page_index from "./pages/index";
@@ -134,6 +135,7 @@ import Page__slug_ from "./pages/_slug_";
         <Route path="/about"><Page_about /></Route>
         <Route path="/admin"><Layout_admin><Page_admin /></Layout_admin></Route>
         <Route path="/login"><Page_login /></Route>
+        <Route path="/reset-password"><Page_reset_password /></Route>
         <Route path="/terms"><Page_terms /></Route>
         <Route path="/dmca"><Page_dmca /></Route>
         <Route path="/feed"><Page_feed /></Route>
