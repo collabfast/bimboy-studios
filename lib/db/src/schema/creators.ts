@@ -28,6 +28,16 @@ export const creatorsTable = pgTable("creators", {
     .notNull()
     .default([]),
   xHandle: text("x_handle"),
+  // Creator contact email. Optional (X login often doesn't return one) and
+  // separate from the Supabase auth identity. `emailVerified` is only set true
+  // after the creator clicks the link in the confirmation email. The token is
+  // stored as a sha256 hash (never the raw token) alongside its expiry.
+  email: text("email"),
+  emailVerified: boolean("email_verified").notNull().default(false),
+  emailVerificationTokenHash: text("email_verification_token_hash"),
+  emailVerificationExpiresAt: timestamp("email_verification_expires_at", {
+    withTimezone: true,
+  }),
   followerCount: integer("follower_count"),
   followersUpdatedAt: timestamp("followers_updated_at", { withTimezone: true }),
   lastTestedAt: timestamp("last_tested_at", { withTimezone: true }),

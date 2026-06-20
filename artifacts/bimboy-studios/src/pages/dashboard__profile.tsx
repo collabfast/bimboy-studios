@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Plus, RefreshCw, Trash2 } from "lucide-react";
+import { CheckCircle2, MailWarning, Plus, RefreshCw, Trash2 } from "lucide-react";
 import {
   getGetCreatorQueryKey,
   getGetCreatorCollabQueryKey,
+  getGetCreatorEmailQueryKey,
   useGetCreator,
   useGetCreatorCollab,
+  useGetCreatorEmail,
   useRefreshCreatorFollowers,
+  useSetCreatorEmail,
   useUpdateCreatorProfile,
   type PlatformLink,
 } from "@workspace/api-client-react";
@@ -45,6 +48,13 @@ export default function DashboardProfilePage() {
       retry: false,
     },
   });
+  const { data: emailStatus } = useGetCreatorEmail(handle, {
+    query: {
+      enabled: !!handle,
+      queryKey: getGetCreatorEmailQueryKey(handle),
+      retry: false,
+    },
+  });
 
   const [copied, setCopied] = useState(false);
   const copyAccountUrl = async () => {
@@ -64,6 +74,9 @@ export default function DashboardProfilePage() {
   const [collabFastUrl, setCollabFastUrl] = useState("");
   const [testingVerified, setTestingVerified] = useState(false);
   const [lastTestedAt, setLastTestedAt] = useState("");
+  const [email, setEmail] = useState("");
+  const [emailNotice, setEmailNotice] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!creator) return;
@@ -77,6 +90,12 @@ export default function DashboardProfilePage() {
   }, [creator]);
 
   useEffect(() => {
+    setEmail(emailStatus?.email ?? "");
+    setEmailNotice(null);
+    setEmailError(null);
+  }, [emailStatus]);
+
+  useEffect(() => {
     setCollabFastUrl(collab?.collabFastUrl ?? "");
   }, [collab]);
 
@@ -85,11 +104,49 @@ export default function DashboardProfilePage() {
     queryClient.invalidateQueries({
       queryKey: getGetCreatorCollabQueryKey(handle),
     });
+    queryClient.invalidateQueries({
+      queryKey: getGetCreatorEmailQueryKey(handle),
+    });
   };
 
   const updateProfile = useUpdateCreatorProfile({
     mutation: { onSuccess: invalidate },
   });
+
+  const setCreatorEmail = useSetCreatorEmail({
+    mutation: {
+      onSuccess: () => {
+        setEmailError(null);
+        setEmailNotice(
+          "Confirmation link sent. Check your inbox to verify this email.",
+        );
+        invalidate();
+      },
+      onError: (err) => {
+        setEmailNotice(null);
+        setEmailError((err as Error).message);
+      },
+    },
+  });
+
+  const onSubmitEmail = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!handle) return;
+    const trimmed = email.trim();
+    setEmailNotice(null);
+    setEmailError(null);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      setEmailError("Please enter a valid email address.");
+      return;
+    }
+    setCreatorEmail.mutate({
+      handle,
+      data: {
+        email: trimmed,
+        appUrl: `${window.location.origin}${import.meta.env.BASE_URL.replace(/\/$/, "")}`,
+      },
+    });
+  };
   const refreshFollowers = useRefreshCreatorFollowers({
     mutation: {
       onSuccess: (updated) => {
@@ -186,6 +243,62 @@ export default function DashboardProfilePage() {
             ) : null}
           </label>
         </div>
+      </section>
+
+      <section className="surface-card rounded-[32px] px-6 py-8 sm:px-8">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-lg font-semibold text-white">Contact email</p>
+          {emailStatus?.email ? (
+            emailStatus.emailVerified ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-200">
+                <CheckCircle2 className="h-3.5 w-3.5" /> Verified
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-400/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-200">
+                <MailWarning className="h-3.5 w-3.5" /> Unverified
+              </span>
+            )
+          ) : null}
+        </div>
+        <p className="mt-2 max-w-2xl text-sm leading-7 text-white/55">
+          Used for payouts and account recovery. We'll email a confirmation link
+          whenever you set or change it.
+        </p>
+        <form
+          onSubmit={onSubmitEmail}
+          className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center"
+        >
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com"
+            className={`${inputClass} sm:max-w-md`}
+          />
+          <button
+            type="submit"
+            disabled={!handle || setCreatorEmail.isPending}
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-pink-500 to-violet-500 px-5 py-2.5 text-sm font-semibold text-white transition disabled:opacity-60"
+          >
+            {setCreatorEmail.isPending
+              ? "Sending…"
+              : emailStatus?.email
+                ? "Update & resend"
+                : "Save & send link"}
+          </button>
+        </form>
+        {emailNotice && (
+          <p className="mt-3 text-sm text-emerald-300">{emailNotice}</p>
+        )}
+        {emailError && (
+          <p className="mt-3 text-sm text-red-300">{emailError}</p>
+        )}
+        {emailStatus?.email && !emailStatus.emailVerified && !emailNotice && (
+          <p className="mt-3 text-xs text-white/45">
+            We sent a confirmation link to {emailStatus.email}. Didn't get it?
+            Update &amp; resend above.
+          </p>
+        )}
       </section>
 
       <form onSubmit={onSubmit} className="grid gap-6">

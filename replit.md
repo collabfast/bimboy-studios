@@ -22,11 +22,16 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- DB schema (source of truth): `lib/db/src/schema/` (e.g. `creators.ts`)
+- API contract (source of truth): `lib/api-spec/openapi.yaml` → Orval codegen → `@workspace/api-client-react` + `@workspace/api-zod`
+- API server routes: `artifacts/api-server/src/routes/`; shared DTO mappers in `artifacts/api-server/src/lib/` (e.g. `feed-items.ts` `toCreatorDto` is PUBLIC)
+- Web app: `artifacts/bimboy-studios/src/` (Vite + React + wouter)
+- Email/verification: backend `artifacts/api-server/src/lib/resend.ts` + creator email routes in `routes/creators.ts`; frontend `pages/verify-email.tsx`
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Creator contact email is private PII: it lives on the creator row but is exposed only via owner-authenticated `GET/POST /creators/:handle/email`, never on the public `Creator` DTO/`toCreatorDto`.
+- Email verification uses a random token stored as a SHA-256 hash with a 24h expiry; the public `POST /email/verify` matches the hash and clears it on success.
 
 ## Product
 

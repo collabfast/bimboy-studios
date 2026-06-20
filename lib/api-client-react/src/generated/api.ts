@@ -28,6 +28,10 @@ import type {
   CreatorEarnings,
   CreatorProfileUpdate,
   CreatorRanking,
+  EmailStatus,
+  EmailUpdate,
+  EmailVerifyRequest,
+  EmailVerifyResult,
   ErrorEnvelope,
   FeedResponse,
   GetCreatorRankingsParams,
@@ -808,6 +812,226 @@ export const useRefreshCreatorFollowers = <TError = ErrorType<void | ErrorEnvelo
         TContext
       > => {
       return useMutation(getRefreshCreatorFollowersMutationOptions(options));
+    }
+
+export const getGetCreatorEmailUrl = (handle: string,) => {
+
+
+
+
+  return `/api/creators/${handle}/email`
+}
+
+/**
+ * @summary Read the creator's contact email and verification state (owner only)
+ */
+export const getCreatorEmail = async (handle: string, options?: RequestInit): Promise<EmailStatus> => {
+
+  return customFetch<EmailStatus>(getGetCreatorEmailUrl(handle),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCreatorEmailQueryKey = (handle: string,) => {
+    return [
+    `/api/creators/${handle}/email`
+    ] as const;
+    }
+
+
+export const getGetCreatorEmailQueryOptions = <TData = Awaited<ReturnType<typeof getCreatorEmail>>, TError = ErrorType<void>>(handle: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCreatorEmail>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCreatorEmailQueryKey(handle);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCreatorEmail>>> = ({ signal }) => getCreatorEmail(handle, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(handle), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCreatorEmail>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetCreatorEmailQueryResult = NonNullable<Awaited<ReturnType<typeof getCreatorEmail>>>
+export type GetCreatorEmailQueryError = ErrorType<void>
+
+
+/**
+ * @summary Read the creator's contact email and verification state (owner only)
+ */
+
+export function useGetCreatorEmail<TData = Awaited<ReturnType<typeof getCreatorEmail>>, TError = ErrorType<void>>(
+ handle: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCreatorEmail>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetCreatorEmailQueryOptions(handle,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getSetCreatorEmailUrl = (handle: string,) => {
+
+
+
+
+  return `/api/creators/${handle}/email`
+}
+
+/**
+ * @summary Set or update the creator's contact email and send a confirmation (owner only)
+ */
+export const setCreatorEmail = async (handle: string,
+    emailUpdate: EmailUpdate, options?: RequestInit): Promise<EmailStatus> => {
+
+  return customFetch<EmailStatus>(getSetCreatorEmailUrl(handle),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      emailUpdate,)
+  }
+);}
+
+
+
+
+export const getSetCreatorEmailMutationOptions = <TError = ErrorType<void | ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setCreatorEmail>>, TError,{handle: string;data: BodyType<EmailUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof setCreatorEmail>>, TError,{handle: string;data: BodyType<EmailUpdate>}, TContext> => {
+
+const mutationKey = ['setCreatorEmail'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof setCreatorEmail>>, {handle: string;data: BodyType<EmailUpdate>}> = (props) => {
+          const {handle,data} = props ?? {};
+
+          return  setCreatorEmail(handle,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SetCreatorEmailMutationResult = NonNullable<Awaited<ReturnType<typeof setCreatorEmail>>>
+    export type SetCreatorEmailMutationBody = BodyType<EmailUpdate>
+    export type SetCreatorEmailMutationError = ErrorType<void | ErrorEnvelope>
+
+    /**
+ * @summary Set or update the creator's contact email and send a confirmation (owner only)
+ */
+export const useSetCreatorEmail = <TError = ErrorType<void | ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setCreatorEmail>>, TError,{handle: string;data: BodyType<EmailUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof setCreatorEmail>>,
+        TError,
+        {handle: string;data: BodyType<EmailUpdate>},
+        TContext
+      > => {
+      return useMutation(getSetCreatorEmailMutationOptions(options));
+    }
+
+export const getVerifyCreatorEmailUrl = () => {
+
+
+
+
+  return `/api/email/verify`
+}
+
+/**
+ * @summary Confirm a creator email from the link sent by email (public)
+ */
+export const verifyCreatorEmail = async (emailVerifyRequest: EmailVerifyRequest, options?: RequestInit): Promise<EmailVerifyResult> => {
+
+  return customFetch<EmailVerifyResult>(getVerifyCreatorEmailUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      emailVerifyRequest,)
+  }
+);}
+
+
+
+
+export const getVerifyCreatorEmailMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verifyCreatorEmail>>, TError,{data: BodyType<EmailVerifyRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof verifyCreatorEmail>>, TError,{data: BodyType<EmailVerifyRequest>}, TContext> => {
+
+const mutationKey = ['verifyCreatorEmail'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof verifyCreatorEmail>>, {data: BodyType<EmailVerifyRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  verifyCreatorEmail(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type VerifyCreatorEmailMutationResult = NonNullable<Awaited<ReturnType<typeof verifyCreatorEmail>>>
+    export type VerifyCreatorEmailMutationBody = BodyType<EmailVerifyRequest>
+    export type VerifyCreatorEmailMutationError = ErrorType<void>
+
+    /**
+ * @summary Confirm a creator email from the link sent by email (public)
+ */
+export const useVerifyCreatorEmail = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verifyCreatorEmail>>, TError,{data: BodyType<EmailVerifyRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof verifyCreatorEmail>>,
+        TError,
+        {data: BodyType<EmailVerifyRequest>},
+        TContext
+      > => {
+      return useMutation(getVerifyCreatorEmailMutationOptions(options));
     }
 
 export const getGetCreatorVerificationUrl = (handle: string,) => {

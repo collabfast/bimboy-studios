@@ -46,6 +46,7 @@ import Page_studios from "./pages/studios";
 import Page_support from "./pages/support";
 import Page_browse from "./pages/browse";
 import Page_signup from "./pages/signup";
+import Page_verify_email from "./pages/verify-email";
 import Page_about from "./pages/about";
 import Page_admin from "./pages/admin";
 import Page_login from "./pages/login";
@@ -132,6 +133,7 @@ import Page__slug_ from "./pages/_slug_";
         <Route path="/support"><Page_support /></Route>
         <Route path="/browse"><Page_browse /></Route>
         <Route path="/signup"><Page_signup /></Route>
+        <Route path="/verify-email"><Page_verify_email /></Route>
         <Route path="/about"><Page_about /></Route>
         <Route path="/admin"><Layout_admin><Page_admin /></Layout_admin></Route>
         <Route path="/login"><Page_login /></Route>

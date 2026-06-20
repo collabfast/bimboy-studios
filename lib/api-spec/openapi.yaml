@@ -201,6 +201,73 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+  /creators/{handle}/email:
+    get:
+      operationId: getCreatorEmail
+      tags: [creators]
+      summary: Read the creator's contact email and verification state (owner only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: handle
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EmailStatus" }
+        "403": { description: Not the owner }
+        "404": { description: Not found }
+    post:
+      operationId: setCreatorEmail
+      tags: [creators]
+      summary: Set or update the creator's contact email and send a confirmation (owner only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: handle
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/EmailUpdate" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EmailStatus" }
+        "400": { description: Invalid email }
+        "403": { description: Not the owner }
+        "404": { description: Not found }
+        "502":
+          description: Email delivery unavailable
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+  /email/verify:
+    post:
+      operationId: verifyCreatorEmail
+      tags: [creators]
+      summary: Confirm a creator email from the link sent by email (public)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/EmailVerifyRequest" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EmailVerifyResult" }
+        "400": { description: Missing token }
   /creators/{handle}/verification:
     get:
       operationId: getCreatorVerification
@@ -681,6 +748,42 @@ components:
         displayName: { type: string }
         handle: { type: string }
         xHandle: { type: string, nullable: true }
+        email:
+          type: string
+          nullable: true
+          description: Optional contact email. When set, a confirmation email is sent.
+        appUrl:
+          type: string
+          description: >-
+            Absolute base URL of the app (origin + base path) used to build the
+            confirmation link so it lands inside the app in dev and prod.
+    EmailUpdate:
+      type: object
+      required: [email]
+      properties:
+        email: { type: string }
+        appUrl:
+          type: string
+          description: >-
+            Absolute base URL of the app (origin + base path) used to build the
+            confirmation link so it lands inside the app in dev and prod.
+    EmailStatus:
+      type: object
+      required: [email, emailVerified]
+      properties:
+        email: { type: string, nullable: true }
+        emailVerified: { type: boolean }
+    EmailVerifyRequest:
+      type: object
+      required: [token]
+      properties:
+        token: { type: string }
+    EmailVerifyResult:
+      type: object
+      required: [verified]
+      properties:
+        verified: { type: boolean }
+        handle: { type: string, nullable: true }
     CreatorProfileUpdate:
       type: object
       properties:

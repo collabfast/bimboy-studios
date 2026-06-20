@@ -1,2 +1,1 @@
-- [Artifact path routing](artifact-path-routing.md) — webhooks/public endpoints must live under an artifact's declared service `paths` (api-server = `/api`), or the platform proxy routes them to the wrong artifact in dev AND prod.
-- [Didit webhook signing](didit-webhook-signing.md) — prefer raw-body HMAC (X-Signature); the "Simple" canonical signs the X-Timestamp HEADER, not the body field.
+- [Creator DTO privacy](creator-dto-privacy.md) — never put email/PII on the public Creator DTO/toCreatorDto; owner-only routes only.

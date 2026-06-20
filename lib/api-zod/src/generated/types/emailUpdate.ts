@@ -6,12 +6,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface CreatorCreate {
-  displayName: string;
-  handle?: string;
-  xHandle?: string | null;
-  /** Optional contact email. When set, a confirmation email is sent. */
-  email?: string | null;
+export interface EmailUpdate {
+  email: string;
   /** Absolute base URL of the app (origin + base path) used to build the confirmation link so it lands inside the app in dev and prod. */
   appUrl?: string;
 }

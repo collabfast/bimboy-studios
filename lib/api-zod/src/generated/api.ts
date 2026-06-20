@@ -119,7 +119,9 @@ export const ListCreatorsResponse = zod.array(ListCreatorsResponseItem)
 export const CreateCreatorBody = zod.object({
   "displayName": zod.string(),
   "handle": zod.string().optional(),
-  "xHandle": zod.string().nullish()
+  "xHandle": zod.string().nullish(),
+  "email": zod.string().nullish().describe('Optional contact email. When set, a confirmation email is sent.'),
+  "appUrl": zod.string().optional().describe('Absolute base URL of the app (origin + base path) used to build the confirmation link so it lands inside the app in dev and prod.')
 })
 
 
@@ -312,6 +314,50 @@ export const RefreshCreatorFollowersResponse = zod.object({
   "lastTestedAt": zod.coerce.date().nullish(),
   "testingVerified": zod.boolean(),
   "idVerificationStatus": zod.enum(['not_started', 'pending', 'in_review', 'approved', 'declined']).describe('Didit ID\/age (KYC) verification status. Distinct from `verified` (creator badge) and `testingVerified` (STI\/health). Creators must be `approved` before they can publish drops or go live.')
+})
+
+
+/**
+ * @summary Read the creator's contact email and verification state (owner only)
+ */
+export const GetCreatorEmailParams = zod.object({
+  "handle": zod.coerce.string()
+})
+
+export const GetCreatorEmailResponse = zod.object({
+  "email": zod.string().nullable(),
+  "emailVerified": zod.boolean()
+})
+
+
+/**
+ * @summary Set or update the creator's contact email and send a confirmation (owner only)
+ */
+export const SetCreatorEmailParams = zod.object({
+  "handle": zod.coerce.string()
+})
+
+export const SetCreatorEmailBody = zod.object({
+  "email": zod.string(),
+  "appUrl": zod.string().optional().describe('Absolute base URL of the app (origin + base path) used to build the confirmation link so it lands inside the app in dev and prod.')
+})
+
+export const SetCreatorEmailResponse = zod.object({
+  "email": zod.string().nullable(),
+  "emailVerified": zod.boolean()
+})
+
+
+/**
+ * @summary Confirm a creator email from the link sent by email (public)
+ */
+export const VerifyCreatorEmailBody = zod.object({
+  "token": zod.string()
+})
+
+export const VerifyCreatorEmailResponse = zod.object({
+  "verified": zod.boolean(),
+  "handle": zod.string().nullish()
 })
 
 

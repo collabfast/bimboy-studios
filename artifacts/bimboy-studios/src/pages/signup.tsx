@@ -58,6 +58,8 @@ export default function SignupPage() {
   const [displayName, setDisplayName] = useState("");
   const [accountName, setAccountName] = useState("");
   const [accountTouched, setAccountTouched] = useState(false);
+  const [email, setEmail] = useState("");
+  const [emailTouched, setEmailTouched] = useState(false);
   const [accountType, setAccountType] = useState<AccountType>("creator");
   const [error, setError] = useState<string | null>(null);
   const [connecting, setConnecting] = useState(false);
@@ -96,6 +98,13 @@ export default function SignupPage() {
     const slug = slugifyHandle(source);
     if (slug) setAccountName(slug);
   }, [twitter, displayName, accountTouched]);
+
+  // Prefill the email from the Supabase identity (empty for X-only logins).
+  // Stop once the user edits it themselves so we never clobber their input.
+  useEffect(() => {
+    if (emailTouched) return;
+    if (user?.email) setEmail(user.email);
+  }, [user, emailTouched]);
 
   const createCreator = useCreateCreator({
     mutation: {
@@ -164,11 +173,18 @@ export default function SignupPage() {
       setError("Please enter an account name (letters and numbers).");
       return;
     }
+    const trimmedEmail = email.trim();
+    if (trimmedEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
     createCreator.mutate({
       data: {
         displayName: name,
         handle,
         xHandle: twitter?.username || null,
+        email: trimmedEmail || null,
+        appUrl: `${window.location.origin}${import.meta.env.BASE_URL.replace(/\/$/, "")}`,
       },
     });
   }
@@ -310,10 +326,18 @@ export default function SignupPage() {
           Email address
           <input
             type="email"
-            value={user.email ?? ""}
-            readOnly
-            className={`${inputClass} cursor-not-allowed opacity-70`}
+            value={email}
+            onChange={(e) => {
+              setEmailTouched(true);
+              setEmail(e.target.value);
+            }}
+            placeholder="you@example.com"
+            className={inputClass}
           />
+          <span className="text-xs text-white/45">
+            We'll send a confirmation link to verify it. Optional, but
+            recommended for payouts and account recovery.
+          </span>
         </label>
 
         <div className="grid gap-2 text-sm text-white/70">
@@ -383,6 +407,7 @@ export default function SignupPage() {
     accountName,
     accountSlug,
     accountType,
+    email,
     error,
     busy,
     connecting,

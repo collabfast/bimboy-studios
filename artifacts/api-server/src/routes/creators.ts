@@ -1,4 +1,5 @@
 import { Router, type IRouter } from "express";
+import { createHash, randomBytes } from "node:crypto";
 import {
   db,
   creatorsTable,
@@ -16,6 +17,10 @@ import {
   getDiditConfig,
   DiditNotConfiguredError,
 } from "../lib/didit";
+import {
+  sendVerificationEmail,
+  ResendNotConfiguredError,
+} from "../lib/resend";
 
 // Auto-refresh the cached follower count when it has gone stale (or when
 // `force` is set). Re-fetches from the X API and persists the new count.
@@ -119,6 +124,66 @@ function isUniqueViolation(err: unknown): boolean {
   );
 }
 
+// Lightweight email validation — good enough to reject obvious garbage before
+// we attempt delivery. Resend performs the authoritative check.
+function normalizeEmail(input: unknown): string | null {
+  if (typeof input !== "string") return null;
+  const email = input.trim().toLowerCase();
+  if (!email || email.length > 320) return null;
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return null;
+  return email;
+}
+
+const EMAIL_TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
+
+function hashEmailToken(token: string): string {
+  return createHash("sha256").update(token).digest("hex");
+}
+
+// Build the confirmation link the creator clicks. `appUrl` is the client's own
+// origin + base path (so the link lands inside the app in dev at the root and
+// in prod under /bimboy-studios/). Falls back to the dev domain root.
+function buildVerifyLink(appUrl: unknown, token: string): string {
+  let base: string | null = null;
+  if (typeof appUrl === "string" && isSafeHttpUrl(appUrl)) {
+    base = appUrl.replace(/\/+$/, "");
+  } else {
+    const devDomain = process.env["REPLIT_DEV_DOMAIN"];
+    if (devDomain) base = `https://${devDomain}`;
+  }
+  if (!base) return "";
+  return `${base}/verify-email?token=${encodeURIComponent(token)}`;
+}
+
+// Persist a fresh verification token + expiry for the creator, then send the
+// confirmation email. Throws ResendNotConfiguredError or a generic Error when
+// delivery fails (callers decide whether that should be fatal).
+async function startEmailVerification(
+  creatorId: string,
+  email: string,
+  appUrl: unknown,
+): Promise<void> {
+  const token = randomBytes(32).toString("hex");
+  // Build the link first and fail closed: if we can't produce a working
+  // confirmation URL, don't persist a token or send a broken email.
+  const link = buildVerifyLink(appUrl, token);
+  if (!link) {
+    throw new Error("Could not build a verification link (missing app URL).");
+  }
+
+  await db
+    .update(creatorsTable)
+    .set({
+      email,
+      emailVerified: false,
+      emailVerificationTokenHash: hashEmailToken(token),
+      emailVerificationExpiresAt: new Date(Date.now() + EMAIL_TOKEN_TTL_MS),
+    })
+    .where(eq(creatorsTable.id, creatorId));
+
+  await sendVerificationEmail(email, link);
+}
+
 // Onboarding: create a creator profile owned by the signed-in user. Handle is
 // derived from the display name (or a requested handle). Insert is retried on a
 // unique-constraint violation so concurrent signups for the same base handle
@@ -143,6 +208,15 @@ router.post("/creators", requireAuth, async (req, res) => {
       ? body.xHandle.replace(/^@/, "").trim()
       : null;
 
+  // Email is optional. When present it is saved on the new profile (unverified)
+  // and a confirmation email is sent. A delivery failure must not block profile
+  // creation, so it is logged and swallowed — the creator can resend later.
+  const email = body.email == null ? null : normalizeEmail(body.email);
+  if (body.email != null && body.email !== "" && email == null) {
+    res.status(400).json({ error: "Please enter a valid email address" });
+    return;
+  }
+
   for (let attempt = 0; attempt < 100; attempt++) {
     const handle = handleCandidate(base, attempt);
     try {
@@ -154,8 +228,21 @@ router.post("/creators", requireAuth, async (req, res) => {
           avatarUrl: `https://i.pravatar.cc/120?u=${encodeURIComponent(handle)}`,
           ownerUserId: req.userId!,
           xHandle,
+          email,
         })
         .returning();
+
+      if (email) {
+        try {
+          await startEmailVerification(created.id, email, body.appUrl);
+        } catch (err) {
+          req.log?.warn(
+            { err: (err as Error).message, creatorId: created.id },
+            "Could not send confirmation email at signup",
+          );
+        }
+      }
+
       res.status(201).json(toCreatorDto(created));
       return;
     } catch (err) {
@@ -431,8 +518,117 @@ router.get("/creators/:handle/collab", requireAuth, async (req, res) => {
   res.json({ collabFastUrl: creator.collabFastUrl ?? null });
 });
 
-// Read the creator's Didit ID-verification status. Owner-only — this is private
-// onboarding state, not part of the public profile surface.
+// Read the creator's contact email and verification state. Owner-only — email
+// is private PII and must never appear on the public creator profile surface.
+router.get("/creators/:handle/email", requireAuth, async (req, res) => {
+  const handle = req.params.handle as string;
+  const [creator] = await db
+    .select()
+    .from(creatorsTable)
+    .where(eq(creatorsTable.handle, handle))
+    .limit(1);
+  if (!creator) {
+    res.status(404).json({ error: "Not found" });
+    return;
+  }
+  if (creator.ownerUserId !== req.userId) {
+    res.status(403).json({ error: "You do not own this creator profile" });
+    return;
+  }
+  res.json({
+    email: creator.email ?? null,
+    emailVerified: creator.emailVerified,
+  });
+});
+
+// Set or update the creator's contact email and (re)send the confirmation
+// email. Owner-only. Saving and sending happen together so the UI's "resend"
+// button can reuse this with the same email.
+router.post("/creators/:handle/email", requireAuth, async (req, res) => {
+  const handle = req.params.handle as string;
+  const [creator] = await db
+    .select()
+    .from(creatorsTable)
+    .where(eq(creatorsTable.handle, handle))
+    .limit(1);
+  if (!creator) {
+    res.status(404).json({ error: "Not found" });
+    return;
+  }
+  if (creator.ownerUserId !== req.userId) {
+    res.status(403).json({ error: "You do not own this creator profile" });
+    return;
+  }
+
+  const body = (req.body ?? {}) as Record<string, unknown>;
+  const email = normalizeEmail(body.email);
+  if (!email) {
+    res.status(400).json({ error: "Please enter a valid email address" });
+    return;
+  }
+
+  try {
+    await startEmailVerification(creator.id, email, body.appUrl);
+  } catch (err) {
+    if (err instanceof ResendNotConfiguredError) {
+      res.status(502).json({
+        error:
+          "Email delivery is not configured yet. Your email was saved; please try again later.",
+      });
+      return;
+    }
+    req.log?.error(
+      { err: (err as Error).message },
+      "Confirmation email delivery failed",
+    );
+    res.status(502).json({
+      error: "Could not send the confirmation email. Please try again.",
+    });
+    return;
+  }
+
+  res.json({ email, emailVerified: false });
+});
+
+// Public: confirm an email from the link in the confirmation message. The raw
+// token is matched against the stored sha256 hash and must not be expired.
+// Idempotent-ish: a second click on a consumed token returns verified=false.
+router.post("/email/verify", async (req, res) => {
+  const body = (req.body ?? {}) as Record<string, unknown>;
+  const token = typeof body.token === "string" ? body.token.trim() : "";
+  if (!token) {
+    res.status(400).json({ error: "A token is required" });
+    return;
+  }
+
+  const tokenHash = hashEmailToken(token);
+  const [creator] = await db
+    .select()
+    .from(creatorsTable)
+    .where(eq(creatorsTable.emailVerificationTokenHash, tokenHash))
+    .limit(1);
+
+  if (
+    !creator ||
+    !creator.emailVerificationExpiresAt ||
+    creator.emailVerificationExpiresAt.getTime() < Date.now()
+  ) {
+    res.json({ verified: false, handle: null });
+    return;
+  }
+
+  await db
+    .update(creatorsTable)
+    .set({
+      emailVerified: true,
+      emailVerificationTokenHash: null,
+      emailVerificationExpiresAt: null,
+    })
+    .where(eq(creatorsTable.id, creator.id));
+
+  res.json({ verified: true, handle: creator.handle });
+});
+
 router.get("/creators/:handle/verification", requireAuth, async (req, res) => {
   const handle = req.params.handle as string;
   const [creator] = await db
