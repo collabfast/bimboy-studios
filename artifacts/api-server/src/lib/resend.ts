@@ -1,8 +1,8 @@
 import { Resend } from "resend";
 
-// Resend is reached through Replit's connector proxy. The access token is
-// short-lived, so we must never cache the client — fetch fresh credentials on
-// every send and construct a new client.
+// Resend is configured via environment secrets: RESEND_API_KEY and
+// RESEND_FROM_EMAIL. Sending fails loudly (ResendNotConfiguredError) when
+// either is missing rather than silently dropping mail.
 
 export class ResendNotConfiguredError extends Error {
   constructor(message = "Email delivery is not configured yet.") {
@@ -11,48 +11,9 @@ export class ResendNotConfiguredError extends Error {
   }
 }
 
-type ResendConnectionSettings = {
-  api_key?: string;
-  from_email?: string;
-};
-
-function getAuthToken(): string | null {
-  const replIdentity = process.env["REPL_IDENTITY"];
-  if (replIdentity) return `repl ${replIdentity}`;
-  const renewal = process.env["WEB_REPL_RENEWAL"];
-  if (renewal) return `depl ${renewal}`;
-  return null;
-}
-
-async function getCredentials(): Promise<{ apiKey: string; fromEmail: string }> {
-  const hostname = process.env["REPLIT_CONNECTORS_HOSTNAME"];
-  const xReplitToken = getAuthToken();
-  if (!hostname || !xReplitToken) {
-    throw new ResendNotConfiguredError();
-  }
-
-  const res = await fetch(
-    `https://${hostname}/api/v2/connection?include_secrets=true&connector_names=resend`,
-    {
-      headers: {
-        Accept: "application/json",
-        X_REPLIT_TOKEN: xReplitToken,
-      },
-    },
-  );
-
-  if (!res.ok) {
-    throw new ResendNotConfiguredError(
-      `Could not load Resend connection (HTTP ${res.status}).`,
-    );
-  }
-
-  const data = (await res.json()) as {
-    items?: Array<{ settings?: ResendConnectionSettings }>;
-  };
-  const settings = data.items?.[0]?.settings;
-  const apiKey = settings?.api_key;
-  const fromEmail = settings?.from_email;
+function getCredentials(): { apiKey: string; fromEmail: string } {
+  const apiKey = process.env["RESEND_API_KEY"];
+  const fromEmail = process.env["RESEND_FROM_EMAIL"];
 
   if (!apiKey || !fromEmail) {
     throw new ResendNotConfiguredError();
@@ -61,12 +22,11 @@ async function getCredentials(): Promise<{ apiKey: string; fromEmail: string }> 
   return { apiKey, fromEmail };
 }
 
-// Never cache the returned client — credentials are short-lived.
-export async function getUncachableResendClient(): Promise<{
+export function getResendClient(): {
   client: Resend;
   fromEmail: string;
-}> {
-  const { apiKey, fromEmail } = await getCredentials();
+} {
+  const { apiKey, fromEmail } = getCredentials();
   return { client: new Resend(apiKey), fromEmail };
 }
 
@@ -79,13 +39,13 @@ function escapeHtml(value: string): string {
 }
 
 // Send the confirmation email containing the verification link. Throws
-// ResendNotConfiguredError when the connector is not set up, or a generic
+// ResendNotConfiguredError when the secrets are not set, or a generic
 // Error when delivery fails.
 export async function sendVerificationEmail(
   to: string,
   link: string,
 ): Promise<void> {
-  const { client, fromEmail } = await getUncachableResendClient();
+  const { client, fromEmail } = getResendClient();
   const safeLink = escapeHtml(link);
 
   const { error } = await client.emails.send({
