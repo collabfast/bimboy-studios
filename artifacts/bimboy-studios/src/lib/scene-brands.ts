@@ -41,39 +41,18 @@ export type PaymentModelInfo = {
   key: ScenePaymentModel;
   name: string;
   headline: string;
-  summary: string;
-  highlights: string[];
-  bestFor: string;
 };
 
 export const PAYMENT_MODEL_LIST: PaymentModelInfo[] = [
   {
     key: "revenue_share",
     name: "Revenue Share",
-    headline: "$200 / scene + ongoing royalties",
-    summary:
-      "Get paid upfront for showing up, then keep earning from the scene's lifetime performance.",
-    highlights: [
-      "$200 appearance fee per scene, paid on shoot day",
-      "Studio holds an exclusive release window after publishing",
-      "25% of net revenue for 1 year on single-performer scenes",
-      "50% revenue split between performers on two-performer scenes",
-    ],
-    bestFor: "Performers betting on a scene's long-term reach.",
+    headline: "Ongoing share of net revenue",
   },
   {
     key: "flat_fee",
     name: "Flat Fee",
-    headline: "$400 / scene, paid in full",
-    summary:
-      "A bigger guaranteed payout with no strings on future revenue — done and paid.",
-    highlights: [
-      "$400 flat fee per scene, no revenue share",
-      "Paid in full, no dependence on scene performance",
-      "30-day studio exclusivity window after release",
-      "Simplest option — clean, predictable payout",
-    ],
-    bestFor: "Performers who want certainty and a larger day-one check.",
+    headline: "Guaranteed one-time payout",
   },
 ];
 
@@ -81,3 +60,53 @@ export const PAYMENT_MODEL_LABELS: Record<ScenePaymentModel, string> = {
   revenue_share: "Revenue Share",
   flat_fee: "Flat Fee",
 };
+
+export type DistributionRow = {
+  label: string;
+  performer: string;
+  platform: string;
+};
+
+export type DistributionGroup = {
+  key: string;
+  title: string;
+  subtitle: string;
+  rows: DistributionRow[];
+};
+
+export const REVENUE_DISTRIBUTION: DistributionGroup[] = [
+  {
+    key: "studio",
+    title: "Studio account videos",
+    subtitle: "Scenes produced and released under our studio brands.",
+    rows: [
+      {
+        label: "Single-performer scene",
+        performer: "25% of net revenue for 1 year",
+        platform: "75% to BimBoy",
+      },
+      {
+        label: "Two-performer scene",
+        performer: "50% of net revenue, split evenly — 25% each",
+        platform: "50% to BimBoy",
+      },
+      {
+        label: "Three or more performers",
+        performer: "50% revenue pool, divided evenly between all performers",
+        platform: "50% to BimBoy",
+      },
+    ],
+  },
+  {
+    key: "creator",
+    title: "Creator account videos",
+    subtitle: "Content you publish to your own creator profile.",
+    rows: [
+      {
+        label: "Any number of creators",
+        performer: "80% revenue pool, divided evenly between all creators",
+        platform: "20% to BimBoy",
+      },
+    ],
+  },
+];

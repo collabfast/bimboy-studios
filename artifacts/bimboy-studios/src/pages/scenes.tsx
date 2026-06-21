@@ -16,6 +16,7 @@ import {
   SCENE_BRAND_LABELS,
   PAYMENT_MODEL_LIST,
   PAYMENT_MODEL_LABELS,
+  REVENUE_DISTRIBUTION,
 } from "@/lib/scene-brands";
 
 const STATUS_STYLES: Record<string, string> = {
@@ -44,7 +45,7 @@ export default function ScenesPage() {
     <div className="page-shell space-y-16 pt-12 pb-24">
       <Hero />
       <BrandShowcase />
-      <PaymentModels />
+      <RevenueDistribution />
       <section id="apply" className="scroll-mt-24">
         <header className="mb-6">
           <h2 className="text-3xl font-bold text-white">Apply to perform</h2>
@@ -137,43 +138,44 @@ function BrandShowcase() {
   );
 }
 
-function PaymentModels() {
+function RevenueDistribution() {
   return (
     <section>
       <header className="mb-6">
-        <h2 className="text-3xl font-bold text-white">Choose how you get paid</h2>
+        <h2 className="text-3xl font-bold text-white">How revenue is shared</h2>
         <p className="mt-2 max-w-2xl text-white/64">
-          Every booking lets you pick one of two compensation models. You select
-          your preference when you apply.
+          Your cut depends on whether a video is produced under a studio brand or
+          posted to your own creator account, and how many performers are in it.
         </p>
       </header>
       <div className="grid gap-6 lg:grid-cols-2">
-        {PAYMENT_MODEL_LIST.map((model) => (
+        {REVENUE_DISTRIBUTION.map((group) => (
           <article
-            key={model.key}
+            key={group.key}
             className="surface-card flex flex-col rounded-[28px] px-6 py-7"
           >
-            <h3 className="text-lg font-bold text-white">{model.name}</h3>
-            <p className="mt-1 bg-gradient-to-r from-pink-400 to-violet-400 bg-clip-text text-2xl font-black text-transparent">
-              {model.headline}
+            <h3 className="text-lg font-bold text-white">{group.title}</h3>
+            <p className="mt-1 text-sm leading-7 text-white/60">
+              {group.subtitle}
             </p>
-            <p className="mt-3 text-sm leading-7 text-white/64">
-              {model.summary}
-            </p>
-            <ul className="mt-5 space-y-3">
-              {model.highlights.map((point) => (
+            <ul className="mt-5 space-y-4">
+              {group.rows.map((row) => (
                 <li
-                  key={point}
-                  className="flex gap-3 text-sm leading-6 text-white/78"
+                  key={row.label}
+                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4"
                 >
-                  <span className="mt-1 inline-block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-gradient-to-r from-pink-400 to-violet-400" />
-                  {point}
+                  <p className="text-sm font-semibold text-white">{row.label}</p>
+                  <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+                    <span className="inline-flex items-center rounded-full bg-gradient-to-r from-pink-500/20 to-violet-500/20 px-3 py-1 font-semibold text-pink-200">
+                      You: {row.performer}
+                    </span>
+                    <span className="inline-flex items-center rounded-full bg-white/8 px-3 py-1 font-medium text-white/60">
+                      {row.platform}
+                    </span>
+                  </div>
                 </li>
               ))}
             </ul>
-            <p className="mt-6 rounded-2xl bg-white/5 px-4 py-3 text-xs font-medium text-white/60">
-              Best for: {model.bestFor}
-            </p>
           </article>
         ))}
       </div>
