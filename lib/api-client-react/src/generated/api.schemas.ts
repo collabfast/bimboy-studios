@@ -319,14 +319,6 @@ export const SceneBrand = {
   bimboys_badbitches: 'bimboys_badbitches',
 } as const;
 
-export type ScenePaymentModel = typeof ScenePaymentModel[keyof typeof ScenePaymentModel];
-
-
-export const ScenePaymentModel = {
-  revenue_share: 'revenue_share',
-  flat_fee: 'flat_fee',
-} as const;
-
 export type SceneApplicationStatus = typeof SceneApplicationStatus[keyof typeof SceneApplicationStatus];
 
 
@@ -340,7 +332,6 @@ export interface SceneApplicationCreate {
   /** Handle of the creator profile applying (must be owned by the caller). */
   handle: string;
   brand: SceneBrand;
-  paymentModel: ScenePaymentModel;
   experience?: string | null;
   message?: string | null;
 }
@@ -352,7 +343,6 @@ export interface SceneApplication {
   displayName: string;
   avatarUrl: string;
   brand: SceneBrand;
-  paymentModel: ScenePaymentModel;
   experience?: string | null;
   message?: string | null;
   status: SceneApplicationStatus;
@@ -367,7 +357,6 @@ export interface SceneApplicationAdmin {
   displayName: string;
   avatarUrl: string;
   brand: SceneBrand;
-  paymentModel: ScenePaymentModel;
   experience?: string | null;
   message?: string | null;
   status: SceneApplicationStatus;

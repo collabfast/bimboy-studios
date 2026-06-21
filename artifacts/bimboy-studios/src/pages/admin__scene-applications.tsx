@@ -7,10 +7,7 @@ import {
   type SceneApplicationStatus,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  SCENE_BRAND_LABELS,
-  PAYMENT_MODEL_LABELS,
-} from "@/lib/scene-brands";
+import { SCENE_BRAND_LABELS } from "@/lib/scene-brands";
 
 const STATUS_STYLES: Record<string, string> = {
   pending: "bg-amber-400/15 text-amber-200 border-amber-300/30",
@@ -141,7 +138,6 @@ function ApplicationCard({ app }: { app: SceneApplicationAdmin }) {
 
       <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
         <Field label="Brand" value={SCENE_BRAND_LABELS[app.brand]} />
-        <Field label="Payment model" value={PAYMENT_MODEL_LABELS[app.paymentModel]} />
         <Field
           label="Contact email"
           value={

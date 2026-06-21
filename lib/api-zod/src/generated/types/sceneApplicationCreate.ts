@@ -6,13 +6,11 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { SceneBrand } from './sceneBrand';
-import type { ScenePaymentModel } from './scenePaymentModel';
 
 export interface SceneApplicationCreate {
   /** Handle of the creator profile applying (must be owned by the caller). */
   handle: string;
   brand: SceneBrand;
-  paymentModel: ScenePaymentModel;
   experience?: string | null;
   message?: string | null;
 }

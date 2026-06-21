@@ -5,7 +5,6 @@ import {
   useListMySceneApplications,
   getListMySceneApplicationsQueryKey,
   type SceneBrand,
-  type ScenePaymentModel,
   type SceneApplication,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -14,8 +13,6 @@ import { useDashboardCreators } from "@/hooks/use-dashboard-creators";
 import {
   SCENE_BRAND_LIST,
   SCENE_BRAND_LABELS,
-  PAYMENT_MODEL_LIST,
-  PAYMENT_MODEL_LABELS,
   REVENUE_DISTRIBUTION,
 } from "@/lib/scene-brands";
 
@@ -261,9 +258,6 @@ function ApplyForm({
   const mutation = useCreateSceneApplication();
   const [handle, setHandle] = useState(handles[0]?.handle ?? "");
   const [brand, setBrand] = useState<SceneBrand>(SCENE_BRAND_LIST[0].key);
-  const [paymentModel, setPaymentModel] = useState<ScenePaymentModel>(
-    PAYMENT_MODEL_LIST[0].key,
-  );
   const [experience, setExperience] = useState("");
   const [message, setMessage] = useState("");
   const [done, setDone] = useState(false);
@@ -277,7 +271,6 @@ function ApplyForm({
         data: {
           handle,
           brand,
-          paymentModel,
           experience: experience.trim() || null,
           message: message.trim() || null,
         },
@@ -357,35 +350,11 @@ function ApplyForm({
         </select>
       </label>
 
-      <fieldset className="space-y-2">
-        <legend className="text-sm font-medium text-white/80">
-          Payment model
-        </legend>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {PAYMENT_MODEL_LIST.map((m) => {
-            const active = paymentModel === m.key;
-            return (
-              <button
-                type="button"
-                key={m.key}
-                onClick={() => setPaymentModel(m.key)}
-                className={`rounded-2xl border px-4 py-3 text-left transition ${
-                  active
-                    ? "border-pink-400/70 bg-pink-500/10"
-                    : "border-white/12 bg-white/5 hover:border-white/25"
-                }`}
-              >
-                <span className="block text-sm font-semibold text-white">
-                  {m.name}
-                </span>
-                <span className="mt-1 block text-xs text-white/60">
-                  {m.headline}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </fieldset>
+      <p className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-xs leading-6 text-white/60">
+        Revenue is shared on a fixed studio-account policy based on the number of
+        performers in the scene — see “How revenue is shared” above. There's no
+        payment model to choose.
+      </p>
 
       <label className="block space-y-2">
         <span className="text-sm font-medium text-white/80">
@@ -454,9 +423,7 @@ function MyApplications() {
                 </span>
                 <StatusPill status={app.status} />
               </div>
-              <p className="mt-1 text-xs text-white/55">
-                {PAYMENT_MODEL_LABELS[app.paymentModel]} · @{app.handle}
-              </p>
+              <p className="mt-1 text-xs text-white/55">@{app.handle}</p>
             </li>
           ))}
         </ul>

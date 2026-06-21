@@ -7,7 +7,6 @@
  */
 import type { SceneApplicationStatus } from './sceneApplicationStatus';
 import type { SceneBrand } from './sceneBrand';
-import type { ScenePaymentModel } from './scenePaymentModel';
 
 export interface SceneApplication {
   id: string;
@@ -16,7 +15,6 @@ export interface SceneApplication {
   displayName: string;
   avatarUrl: string;
   brand: SceneBrand;
-  paymentModel: ScenePaymentModel;
   experience?: string | null;
   message?: string | null;
   status: SceneApplicationStatus;

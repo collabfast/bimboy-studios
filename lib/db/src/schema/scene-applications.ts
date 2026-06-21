@@ -7,11 +7,6 @@ import { creatorsTable } from "./creators";
 export const SCENE_BRANDS = ["backpackboys", "bimboys_badbitches"] as const;
 export type SceneBrand = (typeof SCENE_BRANDS)[number];
 
-// The two compensation options a performer can choose (Paradox Systems revenue
-// model): a revenue-share deal or a flat appearance fee.
-export const SCENE_PAYMENT_MODELS = ["revenue_share", "flat_fee"] as const;
-export type ScenePaymentModel = (typeof SCENE_PAYMENT_MODELS)[number];
-
 // Review lifecycle of an application.
 export const SCENE_APPLICATION_STATUSES = [
   "pending",
@@ -30,7 +25,6 @@ export const sceneApplicationsTable = pgTable("scene_applications", {
     .notNull()
     .references(() => creatorsTable.id, { onDelete: "cascade" }),
   brand: text("brand").notNull(),
-  paymentModel: text("payment_model").notNull(),
   // Free-text performer-supplied context.
   experience: text("experience"),
   message: text("message"),

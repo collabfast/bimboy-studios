@@ -711,7 +711,6 @@ export const GetStorageObjectParams = zod.object({
 export const CreateSceneApplicationBody = zod.object({
   "handle": zod.string().describe('Handle of the creator profile applying (must be owned by the caller).'),
   "brand": zod.enum(['backpackboys', 'bimboys_badbitches']),
-  "paymentModel": zod.enum(['revenue_share', 'flat_fee']),
   "experience": zod.string().nullish(),
   "message": zod.string().nullish()
 })
@@ -727,7 +726,6 @@ export const ListSceneApplicationsResponseItem = zod.object({
   "displayName": zod.string(),
   "avatarUrl": zod.string(),
   "brand": zod.enum(['backpackboys', 'bimboys_badbitches']),
-  "paymentModel": zod.enum(['revenue_share', 'flat_fee']),
   "experience": zod.string().nullish(),
   "message": zod.string().nullish(),
   "status": zod.enum(['pending', 'approved', 'declined']),
@@ -751,7 +749,6 @@ export const ListMySceneApplicationsResponseItem = zod.object({
   "displayName": zod.string(),
   "avatarUrl": zod.string(),
   "brand": zod.enum(['backpackboys', 'bimboys_badbitches']),
-  "paymentModel": zod.enum(['revenue_share', 'flat_fee']),
   "experience": zod.string().nullish(),
   "message": zod.string().nullish(),
   "status": zod.enum(['pending', 'approved', 'declined']),
@@ -779,7 +776,6 @@ export const UpdateSceneApplicationStatusResponse = zod.object({
   "displayName": zod.string(),
   "avatarUrl": zod.string(),
   "brand": zod.enum(['backpackboys', 'bimboys_badbitches']),
-  "paymentModel": zod.enum(['revenue_share', 'flat_fee']),
   "experience": zod.string().nullish(),
   "message": zod.string().nullish(),
   "status": zod.enum(['pending', 'approved', 'declined']),

@@ -4,7 +4,6 @@ import {
   creatorsTable,
   sceneApplicationsTable,
   SCENE_BRANDS,
-  SCENE_PAYMENT_MODELS,
   SCENE_APPLICATION_STATUSES,
   type SceneApplication,
   type Creator,
@@ -24,7 +23,6 @@ function toDto(app: SceneApplication, creator: Creator) {
     displayName: creator.displayName,
     avatarUrl: creator.avatarUrl,
     brand: app.brand,
-    paymentModel: app.paymentModel,
     experience: app.experience,
     message: app.message,
     status: app.status,
@@ -44,10 +42,12 @@ function toAdminDto(app: SceneApplication, creator: Creator) {
   };
 }
 
-// POST /scene-applications — a signed-in creator applies for a brand/payment
-// model using one of their owned profiles (identified by handle).
+// POST /scene-applications — a signed-in creator applies for a studio brand
+// using one of their owned profiles (identified by handle). The revenue split
+// is a fixed studio-account policy (by performer count), not a per-application
+// choice, so no payment model is stored.
 router.post("/scene-applications", requireAuth, async (req, res) => {
-  const { handle, brand, paymentModel, experience, message } = req.body ?? {};
+  const { handle, brand, experience, message } = req.body ?? {};
 
   if (!handle || typeof handle !== "string") {
     res.status(400).json({ error: "handle is required" });
@@ -55,10 +55,6 @@ router.post("/scene-applications", requireAuth, async (req, res) => {
   }
   if (!SCENE_BRANDS.includes(brand)) {
     res.status(400).json({ error: "Invalid brand" });
-    return;
-  }
-  if (!SCENE_PAYMENT_MODELS.includes(paymentModel)) {
-    res.status(400).json({ error: "Invalid paymentModel" });
     return;
   }
 
@@ -81,7 +77,6 @@ router.post("/scene-applications", requireAuth, async (req, res) => {
     .values({
       creatorId: creator.id,
       brand,
-      paymentModel,
       experience: typeof experience === "string" && experience.trim() ? experience.trim() : null,
       message: typeof message === "string" && message.trim() ? message.trim() : null,
     })

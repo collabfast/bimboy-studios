@@ -1106,27 +1106,23 @@ components:
     SceneBrand:
       type: string
       enum: [backpackboys, bimboys_badbitches]
-    ScenePaymentModel:
-      type: string
-      enum: [revenue_share, flat_fee]
     SceneApplicationStatus:
       type: string
       enum: [pending, approved, declined]
     SceneApplicationCreate:
       type: object
-      required: [handle, brand, paymentModel]
+      required: [handle, brand]
       properties:
         handle:
           type: string
           description: Handle of the creator profile applying (must be owned by the caller).
         brand: { $ref: "#/components/schemas/SceneBrand" }
-        paymentModel: { $ref: "#/components/schemas/ScenePaymentModel" }
         experience: { type: string, nullable: true }
         message: { type: string, nullable: true }
     SceneApplication:
       type: object
       required:
-        [id, creatorId, handle, displayName, avatarUrl, brand, paymentModel, status, createdAt, updatedAt]
+        [id, creatorId, handle, displayName, avatarUrl, brand, status, createdAt, updatedAt]
       properties:
         id: { type: string }
         creatorId: { type: string }
@@ -1134,7 +1130,6 @@ components:
         displayName: { type: string }
         avatarUrl: { type: string }
         brand: { $ref: "#/components/schemas/SceneBrand" }
-        paymentModel: { $ref: "#/components/schemas/ScenePaymentModel" }
         experience: { type: string, nullable: true }
         message: { type: string, nullable: true }
         status: { $ref: "#/components/schemas/SceneApplicationStatus" }
@@ -1143,7 +1138,7 @@ components:
     SceneApplicationAdmin:
       type: object
       required:
-        [id, creatorId, handle, displayName, avatarUrl, brand, paymentModel, status, contactEmailVerified, createdAt, updatedAt]
+        [id, creatorId, handle, displayName, avatarUrl, brand, status, contactEmailVerified, createdAt, updatedAt]
       properties:
         id: { type: string }
         creatorId: { type: string }
@@ -1151,7 +1146,6 @@ components:
         displayName: { type: string }
         avatarUrl: { type: string }
         brand: { $ref: "#/components/schemas/SceneBrand" }
-        paymentModel: { $ref: "#/components/schemas/ScenePaymentModel" }
         experience: { type: string, nullable: true }
         message: { type: string, nullable: true }
         status: { $ref: "#/components/schemas/SceneApplicationStatus" }

@@ -1,4 +1,4 @@
-import type { SceneBrand, ScenePaymentModel } from "@workspace/api-client-react";
+import type { SceneBrand } from "@workspace/api-client-react";
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -35,30 +35,6 @@ export const SCENE_BRAND_LIST: SceneBrandInfo[] = [
 export const SCENE_BRAND_LABELS: Record<SceneBrand, string> = {
   backpackboys: "BackPackBoys",
   bimboys_badbitches: "BimBoys & Bad Bitches",
-};
-
-export type PaymentModelInfo = {
-  key: ScenePaymentModel;
-  name: string;
-  headline: string;
-};
-
-export const PAYMENT_MODEL_LIST: PaymentModelInfo[] = [
-  {
-    key: "revenue_share",
-    name: "Revenue Share",
-    headline: "Ongoing share of net revenue",
-  },
-  {
-    key: "flat_fee",
-    name: "Flat Fee",
-    headline: "Guaranteed one-time payout",
-  },
-];
-
-export const PAYMENT_MODEL_LABELS: Record<ScenePaymentModel, string> = {
-  revenue_share: "Revenue Share",
-  flat_fee: "Flat Fee",
 };
 
 export type DistributionRow = {

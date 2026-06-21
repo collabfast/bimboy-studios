@@ -43,7 +43,6 @@ export * from './sceneApplicationCreate';
 export * from './sceneApplicationStatus';
 export * from './sceneApplicationStatusUpdate';
 export * from './sceneBrand';
-export * from './scenePaymentModel';
 export * from './uploadUrlRequest';
 export * from './uploadUrlResponse';
 export * from './verificationSession';
