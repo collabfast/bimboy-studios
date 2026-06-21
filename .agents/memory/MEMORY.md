@@ -1,1 +1,2 @@
-- [Creator DTO privacy](creator-dto-privacy.md) — never put email/PII on the public Creator DTO/toCreatorDto; owner-only routes only.
+- [Creator DTO privacy](creator-dto-privacy.md) — creator contact email is private PII; never expose it on the public Creator DTO/toCreatorDto.
+- [Didit workflow type](didit-workflow-type.md) — DIDIT_WORKFLOW_ID must be a `kyc` workflow for onboarding; a `biometric_authentication` one 400s demanding portrait_image → route 502s.
