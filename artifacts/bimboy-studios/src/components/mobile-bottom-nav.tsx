@@ -1,11 +1,12 @@
 import { Link, useLocation } from "wouter";
-import { Flame, Library, LayoutDashboard, Rocket, PlusSquare } from "lucide-react";
+import { Flame, Library, LayoutDashboard, Clapperboard, Rocket, PlusSquare } from "lucide-react";
 
 export function MobileBottomNav() {
   const [loc] = useLocation();
   const items = [
     { href: "/", label: "Feed", icon: Flame, match: loc === "/" || loc === "/feed" },
     { href: "/library", label: "Library", icon: Library, match: loc.startsWith("/library") },
+    { href: "/scenes", label: "Scenes", icon: Clapperboard, match: loc.startsWith("/scenes") },
     { href: "/studio", label: "Studio", icon: LayoutDashboard, match: loc.startsWith("/studio") },
     { href: "/boost", label: "Boost", icon: Rocket, match: loc.startsWith("/boost") },
     { href: "/post", label: "Post", icon: PlusSquare, match: loc.startsWith("/post") },
