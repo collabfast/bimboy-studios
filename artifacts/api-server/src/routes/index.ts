@@ -8,6 +8,7 @@ import libraryRouter from "./library";
 import analyticsRouter from "./analytics";
 import earningsRouter from "./earnings";
 import consentRouter from "./consent";
+import sceneApplicationsRouter from "./scene-applications";
 import storageRouter from "./storage";
 
 const router: IRouter = Router();
@@ -21,6 +22,7 @@ router.use(libraryRouter);
 router.use(analyticsRouter);
 router.use(earningsRouter);
 router.use(consentRouter);
+router.use(sceneApplicationsRouter);
 router.use(storageRouter);
 
 export default router;

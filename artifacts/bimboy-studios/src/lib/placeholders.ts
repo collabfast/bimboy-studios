@@ -13,6 +13,7 @@ export const siteNavigation: NavItem[] = [
   { href: "/", label: "Home" },
   { href: "/browse", label: "Browse" },
   { href: "/creators", label: "Creators" },
+  { href: "/scenes", label: "Shoot Scenes" },
 ];
 
 export const stats: StatItem[] = [
@@ -194,6 +195,11 @@ export const adminNavigation: DashboardNavItem[] = [
     href: "/admin/videos",
     label: "Videos",
     description: "Moderation and publishing operations shell.",
+  },
+  {
+    href: "/admin/scene-applications",
+    label: "Scene Applications",
+    description: "Review creators applying to shoot for studio brands.",
   },
   {
     href: "/admin/studios",

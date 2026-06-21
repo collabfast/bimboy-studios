@@ -131,5 +131,29 @@ export const requireAuth: RequestHandler = async (req, res, next) => {
   }
 };
 
+// Admin allowlist — a comma-separated list of email addresses in the
+// ADMIN_EMAILS env var. Fail-closed: when unset, nobody is an admin.
+const ADMIN_EMAILS = new Set(
+  (process.env["ADMIN_EMAILS"] || "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean),
+);
+
+export function isAdminEmail(email?: string | null): boolean {
+  if (!email) return false;
+  return ADMIN_EMAILS.has(email.toLowerCase());
+}
+
+// Gate for admin-only routes. Chain *after* requireAuth so req.userEmail is set
+// from a verified token, then check it against the allowlist.
+export const ensureAdmin: RequestHandler = (req, res, next) => {
+  if (!isAdminEmail(req.userEmail)) {
+    res.status(403).json({ error: "Admin access required" });
+    return;
+  }
+  next();
+};
+
 // re-export Express types so other modules can opt-in without importing twice
 export type { Request, Response, NextFunction };

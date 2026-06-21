@@ -705,3 +705,90 @@ export const GetStorageObjectParams = zod.object({
 })
 
 
+/**
+ * @summary Apply to shoot scenes for a studio brand (creators only)
+ */
+export const CreateSceneApplicationBody = zod.object({
+  "handle": zod.string().describe('Handle of the creator profile applying (must be owned by the caller).'),
+  "brand": zod.enum(['backpackboys', 'bimboys_badbitches']),
+  "paymentModel": zod.enum(['revenue_share', 'flat_fee']),
+  "experience": zod.string().nullish(),
+  "message": zod.string().nullish()
+})
+
+
+/**
+ * @summary List all scene applications (admin only)
+ */
+export const ListSceneApplicationsResponseItem = zod.object({
+  "id": zod.string(),
+  "creatorId": zod.string(),
+  "handle": zod.string(),
+  "displayName": zod.string(),
+  "avatarUrl": zod.string(),
+  "brand": zod.enum(['backpackboys', 'bimboys_badbitches']),
+  "paymentModel": zod.enum(['revenue_share', 'flat_fee']),
+  "experience": zod.string().nullish(),
+  "message": zod.string().nullish(),
+  "status": zod.enum(['pending', 'approved', 'declined']),
+  "contactEmail": zod.string().nullish().describe('Applicant\'s contact email (private PII, admin-only).'),
+  "contactEmailVerified": zod.boolean(),
+  "xHandle": zod.string().nullish(),
+  "followerCount": zod.number().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const ListSceneApplicationsResponse = zod.array(ListSceneApplicationsResponseItem)
+
+
+/**
+ * @summary Scene applications submitted by the signed-in creator
+ */
+export const ListMySceneApplicationsResponseItem = zod.object({
+  "id": zod.string(),
+  "creatorId": zod.string(),
+  "handle": zod.string(),
+  "displayName": zod.string(),
+  "avatarUrl": zod.string(),
+  "brand": zod.enum(['backpackboys', 'bimboys_badbitches']),
+  "paymentModel": zod.enum(['revenue_share', 'flat_fee']),
+  "experience": zod.string().nullish(),
+  "message": zod.string().nullish(),
+  "status": zod.enum(['pending', 'approved', 'declined']),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const ListMySceneApplicationsResponse = zod.array(ListMySceneApplicationsResponseItem)
+
+
+/**
+ * @summary Approve or decline a scene application (admin only)
+ */
+export const UpdateSceneApplicationStatusParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const UpdateSceneApplicationStatusBody = zod.object({
+  "status": zod.enum(['pending', 'approved', 'declined'])
+})
+
+export const UpdateSceneApplicationStatusResponse = zod.object({
+  "id": zod.string(),
+  "creatorId": zod.string(),
+  "handle": zod.string(),
+  "displayName": zod.string(),
+  "avatarUrl": zod.string(),
+  "brand": zod.enum(['backpackboys', 'bimboys_badbitches']),
+  "paymentModel": zod.enum(['revenue_share', 'flat_fee']),
+  "experience": zod.string().nullish(),
+  "message": zod.string().nullish(),
+  "status": zod.enum(['pending', 'approved', 'declined']),
+  "contactEmail": zod.string().nullish().describe('Applicant\'s contact email (private PII, admin-only).'),
+  "contactEmailVerified": zod.boolean(),
+  "xHandle": zod.string().nullish(),
+  "followerCount": zod.number().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+

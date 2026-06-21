@@ -1,0 +1,8 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "yYbargxCsY0o8NNNRgi8D"
+uri = "file://artifacts/bimboy-studios/public/images/brands/bimboys-badbitches-logo.png"
+type = "image"
+title = "generated_image"

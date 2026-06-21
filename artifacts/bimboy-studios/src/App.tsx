@@ -33,6 +33,8 @@ import Page_admin__creators from "./pages/admin__creators";
 import Page_admin__reports from "./pages/admin__reports";
 import Page_admin__studios from "./pages/admin__studios";
 import Page_admin__videos from "./pages/admin__videos";
+import Page_admin__scene_applications from "./pages/admin__scene-applications";
+import Page_scenes from "./pages/scenes";
 import Page_join__creator from "./pages/join__creator";
 import Page_join__manager from "./pages/join__manager";
 import Page_studios___studioSlug_ from "./pages/studios___studioSlug_";
@@ -120,6 +122,7 @@ import Page__slug_ from "./pages/_slug_";
         <Route path="/admin/reports"><Layout_admin><Page_admin__reports /></Layout_admin></Route>
         <Route path="/admin/studios"><Layout_admin><Page_admin__studios /></Layout_admin></Route>
         <Route path="/admin/videos"><Layout_admin><Page_admin__videos /></Layout_admin></Route>
+        <Route path="/admin/scene-applications"><Layout_admin><Page_admin__scene_applications /></Layout_admin></Route>
         <Route path="/join/creator"><Page_join__creator /></Route>
         <Route path="/join/manager"><Page_join__manager /></Route>
         <Route path="/studios/:studioSlug"><Page_studios___studioSlug_ /></Route>
@@ -132,6 +135,7 @@ import Page__slug_ from "./pages/_slug_";
         <Route path="/studios"><Page_studios /></Route>
         <Route path="/support"><Page_support /></Route>
         <Route path="/browse"><Page_browse /></Route>
+        <Route path="/scenes"><Page_scenes /></Route>
         <Route path="/signup"><Page_signup /></Route>
         <Route path="/verify-email"><Page_verify_email /></Route>
         <Route path="/about"><Page_about /></Route>

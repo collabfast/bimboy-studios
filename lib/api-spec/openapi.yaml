@@ -16,6 +16,8 @@ tags:
   - name: analytics
   - name: earnings
   - name: consent
+  - name: scene-applications
+    description: Creators applying to shoot scenes for studio brands.
   - name: Storage
     description: Object storage upload and serving endpoints.
 paths:
@@ -666,6 +668,87 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorEnvelope"
+  /scene-applications:
+    post:
+      operationId: createSceneApplication
+      tags: [scene-applications]
+      summary: Apply to shoot scenes for a studio brand (creators only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SceneApplicationCreate" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SceneApplication" }
+        "400": { description: Invalid request }
+        "401": { description: Authentication required }
+        "403": { description: You do not own this creator profile }
+        "404": { description: Creator profile not found }
+    get:
+      operationId: listSceneApplications
+      tags: [scene-applications]
+      summary: List all scene applications (admin only)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/SceneApplicationAdmin" }
+        "401": { description: Authentication required }
+        "403": { description: Admin access required }
+  /me/scene-applications:
+    get:
+      operationId: listMySceneApplications
+      tags: [scene-applications]
+      summary: Scene applications submitted by the signed-in creator
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/SceneApplication" }
+        "401": { description: Authentication required }
+  /scene-applications/{id}:
+    patch:
+      operationId: updateSceneApplicationStatus
+      tags: [scene-applications]
+      summary: Approve or decline a scene application (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SceneApplicationStatusUpdate" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SceneApplicationAdmin" }
+        "400": { description: Invalid request }
+        "401": { description: Authentication required }
+        "403": { description: Admin access required }
+        "404": { description: Not found }
 components:
   securitySchemes:
     bearerAuth:
@@ -1020,3 +1103,69 @@ components:
       required: [error]
       properties:
         error: { type: string }
+    SceneBrand:
+      type: string
+      enum: [backpackboys, bimboys_badbitches]
+    ScenePaymentModel:
+      type: string
+      enum: [revenue_share, flat_fee]
+    SceneApplicationStatus:
+      type: string
+      enum: [pending, approved, declined]
+    SceneApplicationCreate:
+      type: object
+      required: [handle, brand, paymentModel]
+      properties:
+        handle:
+          type: string
+          description: Handle of the creator profile applying (must be owned by the caller).
+        brand: { $ref: "#/components/schemas/SceneBrand" }
+        paymentModel: { $ref: "#/components/schemas/ScenePaymentModel" }
+        experience: { type: string, nullable: true }
+        message: { type: string, nullable: true }
+    SceneApplication:
+      type: object
+      required:
+        [id, creatorId, handle, displayName, avatarUrl, brand, paymentModel, status, createdAt, updatedAt]
+      properties:
+        id: { type: string }
+        creatorId: { type: string }
+        handle: { type: string }
+        displayName: { type: string }
+        avatarUrl: { type: string }
+        brand: { $ref: "#/components/schemas/SceneBrand" }
+        paymentModel: { $ref: "#/components/schemas/ScenePaymentModel" }
+        experience: { type: string, nullable: true }
+        message: { type: string, nullable: true }
+        status: { $ref: "#/components/schemas/SceneApplicationStatus" }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    SceneApplicationAdmin:
+      type: object
+      required:
+        [id, creatorId, handle, displayName, avatarUrl, brand, paymentModel, status, contactEmailVerified, createdAt, updatedAt]
+      properties:
+        id: { type: string }
+        creatorId: { type: string }
+        handle: { type: string }
+        displayName: { type: string }
+        avatarUrl: { type: string }
+        brand: { $ref: "#/components/schemas/SceneBrand" }
+        paymentModel: { $ref: "#/components/schemas/ScenePaymentModel" }
+        experience: { type: string, nullable: true }
+        message: { type: string, nullable: true }
+        status: { $ref: "#/components/schemas/SceneApplicationStatus" }
+        contactEmail:
+          type: string
+          nullable: true
+          description: Applicant's contact email (private PII, admin-only).
+        contactEmailVerified: { type: boolean }
+        xHandle: { type: string, nullable: true }
+        followerCount: { type: integer, nullable: true }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    SceneApplicationStatusUpdate:
+      type: object
+      required: [status]
+      properties:
+        status: { $ref: "#/components/schemas/SceneApplicationStatus" }

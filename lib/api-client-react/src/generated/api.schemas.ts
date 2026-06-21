@@ -311,6 +311,79 @@ export interface ErrorEnvelope {
   error: string;
 }
 
+export type SceneBrand = typeof SceneBrand[keyof typeof SceneBrand];
+
+
+export const SceneBrand = {
+  backpackboys: 'backpackboys',
+  bimboys_badbitches: 'bimboys_badbitches',
+} as const;
+
+export type ScenePaymentModel = typeof ScenePaymentModel[keyof typeof ScenePaymentModel];
+
+
+export const ScenePaymentModel = {
+  revenue_share: 'revenue_share',
+  flat_fee: 'flat_fee',
+} as const;
+
+export type SceneApplicationStatus = typeof SceneApplicationStatus[keyof typeof SceneApplicationStatus];
+
+
+export const SceneApplicationStatus = {
+  pending: 'pending',
+  approved: 'approved',
+  declined: 'declined',
+} as const;
+
+export interface SceneApplicationCreate {
+  /** Handle of the creator profile applying (must be owned by the caller). */
+  handle: string;
+  brand: SceneBrand;
+  paymentModel: ScenePaymentModel;
+  experience?: string | null;
+  message?: string | null;
+}
+
+export interface SceneApplication {
+  id: string;
+  creatorId: string;
+  handle: string;
+  displayName: string;
+  avatarUrl: string;
+  brand: SceneBrand;
+  paymentModel: ScenePaymentModel;
+  experience?: string | null;
+  message?: string | null;
+  status: SceneApplicationStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SceneApplicationAdmin {
+  id: string;
+  creatorId: string;
+  handle: string;
+  displayName: string;
+  avatarUrl: string;
+  brand: SceneBrand;
+  paymentModel: ScenePaymentModel;
+  experience?: string | null;
+  message?: string | null;
+  status: SceneApplicationStatus;
+  /** Applicant's contact email (private PII, admin-only). */
+  contactEmail?: string | null;
+  contactEmailVerified: boolean;
+  xHandle?: string | null;
+  followerCount?: number | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SceneApplicationStatusUpdate {
+  status: SceneApplicationStatus;
+}
+
 export type GetFeedParams = {
 /**
  * @minimum 1

@@ -46,6 +46,10 @@ import type {
   Purchase,
   PurchaseRequest,
   PurchaseResponse,
+  SceneApplication,
+  SceneApplicationAdmin,
+  SceneApplicationCreate,
+  SceneApplicationStatusUpdate,
   UploadUrlRequest,
   UploadUrlResponse,
   VerificationSession,
@@ -2372,4 +2376,301 @@ export function useGetStorageObject<TData = Awaited<ReturnType<typeof getStorage
 
 
 
+
+export const getCreateSceneApplicationUrl = () => {
+
+
+
+
+  return `/api/scene-applications`
+}
+
+/**
+ * @summary Apply to shoot scenes for a studio brand (creators only)
+ */
+export const createSceneApplication = async (sceneApplicationCreate: SceneApplicationCreate, options?: RequestInit): Promise<SceneApplication> => {
+
+  return customFetch<SceneApplication>(getCreateSceneApplicationUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      sceneApplicationCreate,)
+  }
+);}
+
+
+
+
+export const getCreateSceneApplicationMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSceneApplication>>, TError,{data: BodyType<SceneApplicationCreate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createSceneApplication>>, TError,{data: BodyType<SceneApplicationCreate>}, TContext> => {
+
+const mutationKey = ['createSceneApplication'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createSceneApplication>>, {data: BodyType<SceneApplicationCreate>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createSceneApplication(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateSceneApplicationMutationResult = NonNullable<Awaited<ReturnType<typeof createSceneApplication>>>
+    export type CreateSceneApplicationMutationBody = BodyType<SceneApplicationCreate>
+    export type CreateSceneApplicationMutationError = ErrorType<void>
+
+    /**
+ * @summary Apply to shoot scenes for a studio brand (creators only)
+ */
+export const useCreateSceneApplication = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSceneApplication>>, TError,{data: BodyType<SceneApplicationCreate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createSceneApplication>>,
+        TError,
+        {data: BodyType<SceneApplicationCreate>},
+        TContext
+      > => {
+      return useMutation(getCreateSceneApplicationMutationOptions(options));
+    }
+
+export const getListSceneApplicationsUrl = () => {
+
+
+
+
+  return `/api/scene-applications`
+}
+
+/**
+ * @summary List all scene applications (admin only)
+ */
+export const listSceneApplications = async ( options?: RequestInit): Promise<SceneApplicationAdmin[]> => {
+
+  return customFetch<SceneApplicationAdmin[]>(getListSceneApplicationsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListSceneApplicationsQueryKey = () => {
+    return [
+    `/api/scene-applications`
+    ] as const;
+    }
+
+
+export const getListSceneApplicationsQueryOptions = <TData = Awaited<ReturnType<typeof listSceneApplications>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listSceneApplications>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListSceneApplicationsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listSceneApplications>>> = ({ signal }) => listSceneApplications({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listSceneApplications>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListSceneApplicationsQueryResult = NonNullable<Awaited<ReturnType<typeof listSceneApplications>>>
+export type ListSceneApplicationsQueryError = ErrorType<void>
+
+
+/**
+ * @summary List all scene applications (admin only)
+ */
+
+export function useListSceneApplications<TData = Awaited<ReturnType<typeof listSceneApplications>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listSceneApplications>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListSceneApplicationsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getListMySceneApplicationsUrl = () => {
+
+
+
+
+  return `/api/me/scene-applications`
+}
+
+/**
+ * @summary Scene applications submitted by the signed-in creator
+ */
+export const listMySceneApplications = async ( options?: RequestInit): Promise<SceneApplication[]> => {
+
+  return customFetch<SceneApplication[]>(getListMySceneApplicationsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListMySceneApplicationsQueryKey = () => {
+    return [
+    `/api/me/scene-applications`
+    ] as const;
+    }
+
+
+export const getListMySceneApplicationsQueryOptions = <TData = Awaited<ReturnType<typeof listMySceneApplications>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listMySceneApplications>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListMySceneApplicationsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listMySceneApplications>>> = ({ signal }) => listMySceneApplications({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listMySceneApplications>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListMySceneApplicationsQueryResult = NonNullable<Awaited<ReturnType<typeof listMySceneApplications>>>
+export type ListMySceneApplicationsQueryError = ErrorType<void>
+
+
+/**
+ * @summary Scene applications submitted by the signed-in creator
+ */
+
+export function useListMySceneApplications<TData = Awaited<ReturnType<typeof listMySceneApplications>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listMySceneApplications>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListMySceneApplicationsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateSceneApplicationStatusUrl = (id: string,) => {
+
+
+
+
+  return `/api/scene-applications/${id}`
+}
+
+/**
+ * @summary Approve or decline a scene application (admin only)
+ */
+export const updateSceneApplicationStatus = async (id: string,
+    sceneApplicationStatusUpdate: SceneApplicationStatusUpdate, options?: RequestInit): Promise<SceneApplicationAdmin> => {
+
+  return customFetch<SceneApplicationAdmin>(getUpdateSceneApplicationStatusUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      sceneApplicationStatusUpdate,)
+  }
+);}
+
+
+
+
+export const getUpdateSceneApplicationStatusMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSceneApplicationStatus>>, TError,{id: string;data: BodyType<SceneApplicationStatusUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateSceneApplicationStatus>>, TError,{id: string;data: BodyType<SceneApplicationStatusUpdate>}, TContext> => {
+
+const mutationKey = ['updateSceneApplicationStatus'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateSceneApplicationStatus>>, {id: string;data: BodyType<SceneApplicationStatusUpdate>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateSceneApplicationStatus(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateSceneApplicationStatusMutationResult = NonNullable<Awaited<ReturnType<typeof updateSceneApplicationStatus>>>
+    export type UpdateSceneApplicationStatusMutationBody = BodyType<SceneApplicationStatusUpdate>
+    export type UpdateSceneApplicationStatusMutationError = ErrorType<void>
+
+    /**
+ * @summary Approve or decline a scene application (admin only)
+ */
+export const useUpdateSceneApplicationStatus = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSceneApplicationStatus>>, TError,{id: string;data: BodyType<SceneApplicationStatusUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateSceneApplicationStatus>>,
+        TError,
+        {id: string;data: BodyType<SceneApplicationStatusUpdate>},
+        TContext
+      > => {
+      return useMutation(getUpdateSceneApplicationStatusMutationOptions(options));
+    }
 
