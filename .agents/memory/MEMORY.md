@@ -1,3 +1,4 @@
 - [Creator DTO privacy](creator-dto-privacy.md) — creator contact email is private PII; never expose it on the public Creator DTO/toCreatorDto.
 - [Didit workflow type](didit-workflow-type.md) — DIDIT_WORKFLOW_ID must be a `kyc` workflow for onboarding; a `biometric_authentication` one 400s demanding portrait_image → route 502s.
 - [Admin access control](admin-access-control.md) — no DB role system; admin routes gate via ensureAdmin + ADMIN_EMAILS allowlist (fail-closed). ApiError not in client barrel — check error.status.
+- [iOS standalone freeze](ios-standalone-freeze.md) — installed home-screen app frozen while browser works = missing PWA manifest/apple meta; add them + reinstall to clear stale shell.

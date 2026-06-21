@@ -1,0 +1,19 @@
+{
+  "name": "BimBoy",
+  "short_name": "BimBoy",
+  "description": "Share the fans and money you deserve",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#050505",
+  "theme_color": "#050505",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
+    }
+  ]
+}
